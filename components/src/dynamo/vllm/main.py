@@ -95,6 +95,7 @@ async def worker():
     # Ensure the original HF name (e.g. "Qwen/Qwen3-0.6B") is used as the served_model_name.
     if not config.served_model_name:
         config.served_model_name = config.engine_args.served_model_name = config.model
+
     if not os.path.exists(config.model):
         config.model = config.engine_args.model = await fetch_llm(config.model)
 

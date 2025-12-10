@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynamo-platform-dynamo-operator-controller-manager
+  namespace: dynamo-system
+  labels:
+    app.kubernetes.io/component: manager
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: dynamo-platform
+      app.kubernetes.io/name: dynamo-operator
+      control-plane: controller-manager
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: dynamo-platform
+        app.kubernetes.io/name: dynamo-operator
+        control-plane: controller-manager
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+    spec:
+      containers:
+        - name: kube-rbac-proxy
+          image: ccr.ccs.tencentyun.com/acejilam/ib-mxvpwiljub:2875e1419d6934455aec1f5e38193307-v0.15.0
+          # image: gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0
+          args:
+            - '--secure-listen-address=0.0.0.0:8443'
+            - '--upstream=http://127.0.0.1:8080/'
+            - '--logtostderr=true'
+            - '--v=0'
+          ports:
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+          env:
+            - name: KUBERNETES_CLUSTER_DOMAIN
+              value: cluster.local
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 5m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            allowPrivilegeEscalation: false
+        - name: manager
+          image: ccr.ccs.tencentyun.com/acejilam/ib-v4qel8dg23:81f7cf1f6479b6d98b7e28cc5c275661-0.7.0
+          # image: nvcr.io/nvidia/ai-dynamo/kubernetes-operator:0.7.0
+          command:
+            - /manager
+      args:
+        - '--health-probe-bind-address=:8081'
+        - '--metrics-bind-address=127.0.0.1:8080'
+        - '--leader-elect'
+        - '--leader-election-id=dynamo.nvidia.com'
+        - '--leader-election-namespace=kube-system'
+        - '--natsAddr=nats://dynamo-platform-nats.dynamo-system.svc.cluster.local:4222'
+        - '--etcdAddr=dynamo-platform-etcd.dynamo-system.svc.cluster.local:2379'
+        - '--grove-termination-delay=4h'
+        - '--mpi-run-ssh-secret-name=mpi-run-ssh-secret'
+        - '--mpi-run-ssh-secret-namespace=dynamo-system'
+        - '--dgdr-profiling-cluster-role-name=dynamo-platform-dynamo-operator-dgdr-profiling'
+        - '--planner-cluster-role-name=dynamo-platform-dynamo-operator-planner'
+        - '--operator-version=0.7.0'
+      envFrom:
+        - secretRef:
+            name: dynamo-deployment-env
+      env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: cluster.local
+          env:
+            - name: KUBERNETES_CLUSTER_DOMAIN
+              value: cluster.local
+          resources:
+            limits:
+              cpu: "4"
+              memory: 4Gi
+            requests:
+              cpu: "4"
+              memory: 4Gi
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 10
+      dnsPolicy: ClusterFirst
+      serviceAccountName: dynamo-platform-dynamo-operator-controller-manager
+      serviceAccount: dynamo-platform-dynamo-operator-controller-manager
+      schedulerName: default-scheduler

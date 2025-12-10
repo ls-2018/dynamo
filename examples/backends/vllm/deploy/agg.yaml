@@ -5,6 +5,7 @@ apiVersion: nvidia.com/v1alpha1
 kind: DynamoGraphDeployment
 metadata:
   name: vllm-agg
+  namespace: dynamo-system
 spec:
   services:
     Frontend:
@@ -12,8 +13,38 @@ spec:
       componentType: frontend
       replicas: 1
       extraPodSpec:
+        volumes:
+          - name: model-cache
+        initContainers:
+          - name: models
+            image: harbor.dev01.zetyun.cn/bugfix-1-datacenter/hub:models
+            command:
+              - /bin/sh
+              - '-c'
+              - 'cp -rf /models/* /data/'
+            volumeMounts:
+              - mountPath: /data
+                name: model-cache
+          - name: models-owner
+            image: harbor.dev01.zetyun.cn/bugfix-1-datacenter/ai-dynamo/vllm-runtime:0.7.0
+            command:
+              - /bin/sh
+              - '-c'
+              - 'chown -R 777 /data/ '
+            securityContext:
+              runAsUser: 0
+            volumeMounts:
+              - mountPath: /data
+                name: model-cache
         mainContainer:
-          image: nvcr.io/nvidia/ai-dynamo/vllm-runtime:my-tag
+          image: harbor.dev01.zetyun.cn/bugfix-1-datacenter/ai-dynamo/vllm-runtime:0.7.0
+          volumeMounts:
+            - mountPath: /data
+              name: model-cache
+          command:
+            - /bin/bash
+            - -c
+            - 'mkdir -p /home/dynamo/.cache/huggingface/hub/ ;cp -rf /data/* /home/dynamo/.cache/huggingface/hub/ ; python3 -m dynamo.frontend'
     VllmDecodeWorker:
       envFromSecret: hf-token-secret
       dynamoNamespace: vllm-agg
@@ -21,15 +52,42 @@ spec:
       replicas: 1
       resources:
         limits:
-          gpu: "1"
+          cpu: "4"
+          custom:
+            nvidia.com/gpu-l40s: "1"
+            'dc.com/cpu-pod-slot': "4"
       extraPodSpec:
+        volumes:
+          - name: model-cache
+        initContainers:
+          - name: models
+            image: harbor.dev01.zetyun.cn/bugfix-1-datacenter/hub:models
+            command:
+              - /bin/sh
+              - '-c'
+              - 'cp -rf /models/* /data/'
+            volumeMounts:
+              - mountPath: /data
+                name: model-cache
+          - name: models-owner
+            image: harbor.dev01.zetyun.cn/bugfix-1-datacenter/ai-dynamo/vllm-runtime:0.7.0
+            command:
+              - /bin/sh
+              - '-c'
+              - 'chown -R 777 /data/'
+            securityContext:
+              runAsUser: 0
+            volumeMounts:
+              - mountPath: /data
+                name: model-cache
         mainContainer:
-          image: nvcr.io/nvidia/ai-dynamo/vllm-runtime:my-tag
+          image: harbor.dev01.zetyun.cn/bugfix-1-datacenter/ai-dynamo/vllm-runtime:0.7.0
+          # image: nvcr.io/nvidia/ai-dynamo/vllm-runtime:0.7.0
           workingDir: /workspace/examples/backends/vllm
+          volumeMounts:
+            - mountPath: /data
+              name: model-cache
           command:
-            - python3
-            - -m
-            - dynamo.vllm
-          args:
-            - --model
-            - Qwen/Qwen3-0.6B
+            - /bin/bash
+            - -c
+            - 'mkdir -p /home/dynamo/.cache/huggingface/hub/ ;cp -rf /data/* /home/dynamo/.cache/huggingface/hub/ ; python3 -m dynamo.vllm --model /data/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca'
