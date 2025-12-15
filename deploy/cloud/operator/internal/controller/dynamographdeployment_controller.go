@@ -412,7 +412,7 @@ func (r *DynamoGraphDeploymentReconciler) reconcileGroveResources(ctx context.Co
 					return true, ""
 				}))
 			// generate the main component virtual service
-			if r.Config.IngressConfig.UseVirtualService() {
+			if ingressSpec.UseVirtualService {
 				mainComponentVirtualService := dynamo.GenerateComponentVirtualService(ctx, dynamo.GetDynamoComponentName(dynamoDeployment, componentName), dynamoDeployment.Namespace, ingressSpec)
 				_, syncedMainComponentVirtualService, err := commonController.SyncResource(ctx, r, dynamoDeployment, func(ctx context.Context) (*networkingv1beta1.VirtualService, bool, error) {
 					if !ingressSpec.IsVirtualServiceEnabled() {
