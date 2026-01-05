@@ -53,8 +53,7 @@ services:
       - server
 
   e3w:
-    #    image: soyking/e3w:latest
-    image: ccr.ccs.tencentyun.com/acejilam/ib-dmk7blvfhi:faa1d5710888d979df05525b20aeee8d-latest
+    image: soyking/e3w:latest
     volumes:
       - ./e3w.ini:/app/conf/config.default.ini
     ports:
@@ -63,8 +62,7 @@ services:
       - server
 
   jaeger:
-    #    image: docker.io/jaegertracing/all-in-one
-    image: ccr.ccs.tencentyun.com/acejilam/ib-hq28x7jgaz:96d04a32f09e1c11570e16de8caf3623-latest
+    image: docker.io/jaegertracing/all-in-one
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: "9411"
       COLLECTOR_OTLP_ENABLED: "true"

@@ -11,3 +11,4 @@ python -m dynamo.frontend --http-port=8000 &
 # --enforce-eager is added for quick deployment. for production use, need to remove this flag
 DYN_SYSTEM_PORT=8081 \
     python -m dynamo.vllm --model Qwen/Qwen3-0.6B --enforce-eager --connector none
+
