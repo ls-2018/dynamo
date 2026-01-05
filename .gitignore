@@ -109,3 +109,7 @@ profiling_results*
 
 # Direnv
 .envrc
+lib/bindings/python/target
+.DS_Store
+target
+RustRover-2025.3.1.tar.gz

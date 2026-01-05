@@ -70,7 +70,7 @@ chrono = { version = "0.4", default-features = false, features = [
     "serde",
 ] }
 cudarc = { version = "0.17.1", features = ["cuda-12020"] }
-dashmap = { version = "6.1" }
+dashmap = { version = "6.1" }                                               # 超快并发 HashMap, std::collections::HashMap 是单线程 / 需外部加锁；DashMap 是内建分片锁的并发 HashMap。
 derive_builder = { version = "0.20" }
 derive-getters = { version = "0.5" }
 either = { version = "1.13", features = ["serde"] }
@@ -89,7 +89,7 @@ modelexpress-common = { version = "0.2.0" }
 humantime = { version = "2.2.0" }
 libc = { version = "0.2" }
 oneshot = { version = "0.1.11", features = ["std", "async"] }
-parking_lot = "0.12.5"
+parking_lot = "0.12.5"   # 该库提供了 Mutex、RwLock、Condvar 和 Once 等锁的实现版本，这些实现比 Rust 标准库中的实现更小、更快且更具灵活性。此外，它还提供了 ReentrantMutex 类型。
 prometheus = { version = "0.14" }
 rand = { version = "0.9.0" }
 reqwest = { version = "0.12.22", default-features = false, features = [
@@ -134,3 +134,4 @@ insta.opt-level = 3
 # These make the build much slower but shrink the binary, and could help performance
 codegen-units = 1
 lto = "thin"
+

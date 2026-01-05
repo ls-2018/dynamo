@@ -1,0 +1,4123 @@
+---
+# Source: kgateway-crds/templates/gateway.kgateway.dev_backends.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.5
+  labels:
+    app: kgateway
+    app.kubernetes.io/name: kgateway
+  name: backends.gateway.kgateway.dev
+spec:
+  group: gateway.kgateway.dev
+  names:
+    categories:
+    - kgateway
+    kind: Backend
+    listKind: BackendList
+    plural: backends
+    singular: backend
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Which backend type?
+      jsonPath: .spec.type
+      name: Type
+      type: string
+    - description: The age of the backend.
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              ai:
+                maxProperties: 1
+                minProperties: 1
+                properties:
+                  llm:
+                    properties:
+                      hostOverride:
+                        properties:
+                          host:
+                            minLength: 1
+                            type: string
+                          port:
+                            format: int32
+                            maximum: 65535
+                            minimum: 1
+                            type: integer
+                        required:
+                        - host
+                        - port
+                        type: object
+                      provider:
+                        maxProperties: 1
+                        minProperties: 1
+                        properties:
+                          anthropic:
+                            properties:
+                              apiVersion:
+                                type: string
+                              authToken:
+                                properties:
+                                  inline:
+                                    type: string
+                                  kind:
+                                    enum:
+                                    - Inline
+                                    - SecretRef
+                                    - Passthrough
+                                    type: string
+                                  secretRef:
+                                    properties:
+                                      name:
+                                        default: ""
+                                        type: string
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                required:
+                                - kind
+                                type: object
+                              model:
+                                type: string
+                            required:
+                            - authToken
+                            type: object
+                          azureopenai:
+                            properties:
+                              apiVersion:
+                                minLength: 1
+                                type: string
+                              authToken:
+                                properties:
+                                  inline:
+                                    type: string
+                                  kind:
+                                    enum:
+                                    - Inline
+                                    - SecretRef
+                                    - Passthrough
+                                    type: string
+                                  secretRef:
+                                    properties:
+                                      name:
+                                        default: ""
+                                        type: string
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                required:
+                                - kind
+                                type: object
+                              deploymentName:
+                                minLength: 1
+                                type: string
+                              endpoint:
+                                minLength: 1
+                                type: string
+                            required:
+                            - apiVersion
+                            - authToken
+                            - deploymentName
+                            - endpoint
+                            type: object
+                          gemini:
+                            properties:
+                              apiVersion:
+                                type: string
+                              authToken:
+                                properties:
+                                  inline:
+                                    type: string
+                                  kind:
+                                    enum:
+                                    - Inline
+                                    - SecretRef
+                                    - Passthrough
+                                    type: string
+                                  secretRef:
+                                    properties:
+                                      name:
+                                        default: ""
+                                        type: string
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                required:
+                                - kind
+                                type: object
+                              model:
+                                type: string
+                            required:
+                            - apiVersion
+                            - authToken
+                            - model
+                            type: object
+                          openai:
+                            properties:
+                              authToken:
+                                properties:
+                                  inline:
+                                    type: string
+                                  kind:
+                                    enum:
+                                    - Inline
+                                    - SecretRef
+                                    - Passthrough
+                                    type: string
+                                  secretRef:
+                                    properties:
+                                      name:
+                                        default: ""
+                                        type: string
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                required:
+                                - kind
+                                type: object
+                              model:
+                                type: string
+                            required:
+                            - authToken
+                            type: object
+                          vertexai:
+                            properties:
+                              apiVersion:
+                                minLength: 1
+                                type: string
+                              authToken:
+                                properties:
+                                  inline:
+                                    type: string
+                                  kind:
+                                    enum:
+                                    - Inline
+                                    - SecretRef
+                                    - Passthrough
+                                    type: string
+                                  secretRef:
+                                    properties:
+                                      name:
+                                        default: ""
+                                        type: string
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                required:
+                                - kind
+                                type: object
+                              location:
+                                minLength: 1
+                                type: string
+                              model:
+                                minLength: 1
+                                type: string
+                              modelPath:
+                                type: string
+                              projectId:
+                                minLength: 1
+                                type: string
+                              publisher:
+                                enum:
+                                - GOOGLE
+                                type: string
+                            required:
+                            - apiVersion
+                            - authToken
+                            - location
+                            - model
+                            - projectId
+                            - publisher
+                            type: object
+                        type: object
+                    required:
+                    - provider
+                    type: object
+                  multipool:
+                    properties:
+                      priorities:
+                        items:
+                          properties:
+                            pool:
+                              items:
+                                properties:
+                                  hostOverride:
+                                    properties:
+                                      host:
+                                        minLength: 1
+                                        type: string
+                                      port:
+                                        format: int32
+                                        maximum: 65535
+                                        minimum: 1
+                                        type: integer
+                                    required:
+                                    - host
+                                    - port
+                                    type: object
+                                  provider:
+                                    maxProperties: 1
+                                    minProperties: 1
+                                    properties:
+                                      anthropic:
+                                        properties:
+                                          apiVersion:
+                                            type: string
+                                          authToken:
+                                            properties:
+                                              inline:
+                                                type: string
+                                              kind:
+                                                enum:
+                                                - Inline
+                                                - SecretRef
+                                                - Passthrough
+                                                type: string
+                                              secretRef:
+                                                properties:
+                                                  name:
+                                                    default: ""
+                                                    type: string
+                                                type: object
+                                                x-kubernetes-map-type: atomic
+                                            required:
+                                            - kind
+                                            type: object
+                                          model:
+                                            type: string
+                                        required:
+                                        - authToken
+                                        type: object
+                                      azureopenai:
+                                        properties:
+                                          apiVersion:
+                                            minLength: 1
+                                            type: string
+                                          authToken:
+                                            properties:
+                                              inline:
+                                                type: string
+                                              kind:
+                                                enum:
+                                                - Inline
+                                                - SecretRef
+                                                - Passthrough
+                                                type: string
+                                              secretRef:
+                                                properties:
+                                                  name:
+                                                    default: ""
+                                                    type: string
+                                                type: object
+                                                x-kubernetes-map-type: atomic
+                                            required:
+                                            - kind
+                                            type: object
+                                          deploymentName:
+                                            minLength: 1
+                                            type: string
+                                          endpoint:
+                                            minLength: 1
+                                            type: string
+                                        required:
+                                        - apiVersion
+                                        - authToken
+                                        - deploymentName
+                                        - endpoint
+                                        type: object
+                                      gemini:
+                                        properties:
+                                          apiVersion:
+                                            type: string
+                                          authToken:
+                                            properties:
+                                              inline:
+                                                type: string
+                                              kind:
+                                                enum:
+                                                - Inline
+                                                - SecretRef
+                                                - Passthrough
+                                                type: string
+                                              secretRef:
+                                                properties:
+                                                  name:
+                                                    default: ""
+                                                    type: string
+                                                type: object
+                                                x-kubernetes-map-type: atomic
+                                            required:
+                                            - kind
+                                            type: object
+                                          model:
+                                            type: string
+                                        required:
+                                        - apiVersion
+                                        - authToken
+                                        - model
+                                        type: object
+                                      openai:
+                                        properties:
+                                          authToken:
+                                            properties:
+                                              inline:
+                                                type: string
+                                              kind:
+                                                enum:
+                                                - Inline
+                                                - SecretRef
+                                                - Passthrough
+                                                type: string
+                                              secretRef:
+                                                properties:
+                                                  name:
+                                                    default: ""
+                                                    type: string
+                                                type: object
+                                                x-kubernetes-map-type: atomic
+                                            required:
+                                            - kind
+                                            type: object
+                                          model:
+                                            type: string
+                                        required:
+                                        - authToken
+                                        type: object
+                                      vertexai:
+                                        properties:
+                                          apiVersion:
+                                            minLength: 1
+                                            type: string
+                                          authToken:
+                                            properties:
+                                              inline:
+                                                type: string
+                                              kind:
+                                                enum:
+                                                - Inline
+                                                - SecretRef
+                                                - Passthrough
+                                                type: string
+                                              secretRef:
+                                                properties:
+                                                  name:
+                                                    default: ""
+                                                    type: string
+                                                type: object
+                                                x-kubernetes-map-type: atomic
+                                            required:
+                                            - kind
+                                            type: object
+                                          location:
+                                            minLength: 1
+                                            type: string
+                                          model:
+                                            minLength: 1
+                                            type: string
+                                          modelPath:
+                                            type: string
+                                          projectId:
+                                            minLength: 1
+                                            type: string
+                                          publisher:
+                                            enum:
+                                            - GOOGLE
+                                            type: string
+                                        required:
+                                        - apiVersion
+                                        - authToken
+                                        - location
+                                        - model
+                                        - projectId
+                                        - publisher
+                                        type: object
+                                    type: object
+                                required:
+                                - provider
+                                type: object
+                              maxItems: 20
+                              minItems: 1
+                              type: array
+                          type: object
+                        maxItems: 20
+                        minItems: 1
+                        type: array
+                    required:
+                    - priorities
+                    type: object
+                type: object
+                x-kubernetes-validations:
+                - message: There must one and only one LLM or MultiPool can be set
+                  rule: (has(self.llm) && !has(self.multipool)) || (!has(self.llm)
+                    && has(self.multipool))
+              aws:
+                properties:
+                  accountId:
+                    maxLength: 12
+                    minLength: 1
+                    pattern: ^[0-9]{12}$
+                    type: string
+                  auth:
+                    properties:
+                      secretRef:
+                        properties:
+                          name:
+                            default: ""
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      type:
+                        enum:
+                        - Secret
+                        type: string
+                    required:
+                    - type
+                    type: object
+                    x-kubernetes-validations:
+                    - message: secretRef must be nil if the type is not 'Secret'
+                      rule: '!(has(self.secretRef) && self.type != ''Secret'')'
+                    - message: secretRef must be specified when type is 'Secret'
+                      rule: '!(!has(self.secretRef) && self.type == ''Secret'')'
+                  lambda:
+                    properties:
+                      endpointURL:
+                        maxLength: 2048
+                        pattern: ^https?://[-a-zA-Z0-9@:%.+~#?&/=]+$
+                        type: string
+                      functionName:
+                        pattern: ^[A-Za-z0-9-_]{1,140}$
+                        type: string
+                      invocationMode:
+                        default: Sync
+                        enum:
+                        - Sync
+                        - Async
+                        type: string
+                      qualifier:
+                        pattern: ^(\$LATEST|[0-9]+|[A-Za-z0-9-_]{1,128})$
+                        type: string
+                    required:
+                    - functionName
+                    type: object
+                  region:
+                    default: us-east-1
+                    maxLength: 63
+                    minLength: 1
+                    pattern: ^[a-z0-9-]+$
+                    type: string
+                required:
+                - accountId
+                type: object
+              static:
+                properties:
+                  hosts:
+                    items:
+                      properties:
+                        host:
+                          minLength: 1
+                          type: string
+                        port:
+                          format: int32
+                          maximum: 65535
+                          minimum: 1
+                          type: integer
+                      required:
+                      - host
+                      - port
+                      type: object
+                    minItems: 1
+                    type: array
+                type: object
+              type:
+                enum:
+                - AI
+                - AWS
+                - Static
+                type: string
+            required:
+            - type
+            type: object
+            x-kubernetes-validations:
+            - message: ai backend must be nil if the type is not 'ai'
+              rule: '!(has(self.ai) && self.type != ''AI'')'
+            - message: ai backend must be specified when type is 'ai'
+              rule: '!(!has(self.ai) && self.type == ''AI'')'
+            - message: aws backend must be nil if the type is not 'aws'
+              rule: '!(has(self.aws) && self.type != ''AWS'')'
+            - message: aws backend must be specified when type is 'aws'
+              rule: '!(!has(self.aws) && self.type == ''AWS'')'
+            - message: static backend must be nil if the type is not 'static'
+              rule: '!(has(self.static) && self.type != ''Static'')'
+            - message: static backend must be specified when type is 'static'
+              rule: '!(!has(self.static) && self.type == ''Static'')'
+          status:
+            properties:
+              conditions:
+                items:
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                maxItems: 8
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+# Source: kgateway-crds/templates/gateway.kgateway.dev_directresponses.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.5
+  labels:
+    app: kgateway
+    app.kubernetes.io/name: kgateway
+  name: directresponses.gateway.kgateway.dev
+spec:
+  group: gateway.kgateway.dev
+  names:
+    categories:
+    - kgateway
+    kind: DirectResponse
+    listKind: DirectResponseList
+    plural: directresponses
+    singular: directresponse
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              body:
+                maxLength: 4096
+                type: string
+              status:
+                format: int32
+                maximum: 599
+                minimum: 200
+                type: integer
+            required:
+            - status
+            type: object
+          status:
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+# Source: kgateway-crds/templates/gateway.kgateway.dev_gatewayextensions.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.5
+  labels:
+    app: kgateway
+    app.kubernetes.io/name: kgateway
+  name: gatewayextensions.gateway.kgateway.dev
+spec:
+  group: gateway.kgateway.dev
+  names:
+    categories:
+    - kgateway
+    kind: GatewayExtension
+    listKind: GatewayExtensionList
+    plural: gatewayextensions
+    singular: gatewayextension
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Which extension type?
+      jsonPath: .spec.type
+      name: Type
+      type: string
+    - description: The age of the gatewayextension.
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              extAuth:
+                properties:
+                  grpcService:
+                    properties:
+                      authority:
+                        type: string
+                      backendRef:
+                        properties:
+                          group:
+                            default: ""
+                            maxLength: 253
+                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                            type: string
+                          kind:
+                            default: Service
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                            type: string
+                          name:
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                          namespace:
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                            type: string
+                          port:
+                            format: int32
+                            maximum: 65535
+                            minimum: 1
+                            type: integer
+                          weight:
+                            default: 1
+                            format: int32
+                            maximum: 1000000
+                            minimum: 0
+                            type: integer
+                        required:
+                        - name
+                        type: object
+                        x-kubernetes-validations:
+                        - message: Must have port for Service reference
+                          rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                            ? has(self.port) : true'
+                    required:
+                    - backendRef
+                    type: object
+                required:
+                - grpcService
+                type: object
+              extProc:
+                properties:
+                  grpcService:
+                    properties:
+                      authority:
+                        type: string
+                      backendRef:
+                        properties:
+                          group:
+                            default: ""
+                            maxLength: 253
+                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                            type: string
+                          kind:
+                            default: Service
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                            type: string
+                          name:
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                          namespace:
+                            maxLength: 63
+                            minLength: 1
+                            pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                            type: string
+                          port:
+                            format: int32
+                            maximum: 65535
+                            minimum: 1
+                            type: integer
+                          weight:
+                            default: 1
+                            format: int32
+                            maximum: 1000000
+                            minimum: 0
+                            type: integer
+                        required:
+                        - name
+                        type: object
+                        x-kubernetes-validations:
+                        - message: Must have port for Service reference
+                          rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                            ? has(self.port) : true'
+                    required:
+                    - backendRef
+                    type: object
+                required:
+                - grpcService
+                type: object
+              type:
+                enum:
+                - ExtAuth
+                - ExtProc
+                - Extended
+                type: string
+            required:
+            - type
+            type: object
+            x-kubernetes-validations:
+            - message: ExtAuth must be set when type is ExtAuth
+              rule: self.type != 'ExtAuth' || has(self.extAuth)
+            - message: ExtProc must be set when type is ExtProc
+              rule: self.type != 'ExtProc' || has(self.extProc)
+            - message: ExtAuth must not be set when type is not ExtAuth
+              rule: self.type == 'ExtAuth' || !has(self.extAuth)
+            - message: ExtProc must not be set when type is not ExtProc
+              rule: self.type == 'ExtProc' || !has(self.extProc)
+          status:
+            properties:
+              conditions:
+                items:
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                maxItems: 8
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+# Source: kgateway-crds/templates/gateway.kgateway.dev_gatewayparameters.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.5
+  labels:
+    app: kgateway
+    app.kubernetes.io/name: kgateway
+  name: gatewayparameters.gateway.kgateway.dev
+spec:
+  group: gateway.kgateway.dev
+  names:
+    categories:
+    - kgateway
+    kind: GatewayParameters
+    listKind: GatewayParametersList
+    plural: gatewayparameters
+    singular: gatewayparameters
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              kube:
+                properties:
+                  aiExtension:
+                    properties:
+                      enabled:
+                        type: boolean
+                      env:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                            valueFrom:
+                              properties:
+                                configMapKeyRef:
+                                  properties:
+                                    key:
+                                      type: string
+                                    name:
+                                      default: ""
+                                      type: string
+                                    optional:
+                                      type: boolean
+                                  required:
+                                  - key
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                                fieldRef:
+                                  properties:
+                                    apiVersion:
+                                      type: string
+                                    fieldPath:
+                                      type: string
+                                  required:
+                                  - fieldPath
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                                resourceFieldRef:
+                                  properties:
+                                    containerName:
+                                      type: string
+                                    divisor:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      x-kubernetes-int-or-string: true
+                                    resource:
+                                      type: string
+                                  required:
+                                  - resource
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                                secretKeyRef:
+                                  properties:
+                                    key:
+                                      type: string
+                                    name:
+                                      default: ""
+                                      type: string
+                                    optional:
+                                      type: boolean
+                                  required:
+                                  - key
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                              type: object
+                          required:
+                          - name
+                          type: object
+                        type: array
+                      image:
+                        properties:
+                          digest:
+                            type: string
+                          pullPolicy:
+                            type: string
+                          registry:
+                            type: string
+                          repository:
+                            type: string
+                          tag:
+                            type: string
+                        type: object
+                      ports:
+                        items:
+                          properties:
+                            containerPort:
+                              format: int32
+                              type: integer
+                            hostIP:
+                              type: string
+                            hostPort:
+                              format: int32
+                              type: integer
+                            name:
+                              type: string
+                            protocol:
+                              default: TCP
+                              type: string
+                          required:
+                          - containerPort
+                          type: object
+                        type: array
+                      resources:
+                        properties:
+                          claims:
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                request:
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                          limits:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            type: object
+                          requests:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            type: object
+                        type: object
+                      securityContext:
+                        properties:
+                          allowPrivilegeEscalation:
+                            type: boolean
+                          appArmorProfile:
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - type
+                            type: object
+                          capabilities:
+                            properties:
+                              add:
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              drop:
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
+                            type: object
+                          privileged:
+                            type: boolean
+                          procMount:
+                            type: string
+                          readOnlyRootFilesystem:
+                            type: boolean
+                          runAsGroup:
+                            format: int64
+                            type: integer
+                          runAsNonRoot:
+                            type: boolean
+                          runAsUser:
+                            format: int64
+                            type: integer
+                          seLinuxOptions:
+                            properties:
+                              level:
+                                type: string
+                              role:
+                                type: string
+                              type:
+                                type: string
+                              user:
+                                type: string
+                            type: object
+                          seccompProfile:
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - type
+                            type: object
+                          windowsOptions:
+                            properties:
+                              gmsaCredentialSpec:
+                                type: string
+                              gmsaCredentialSpecName:
+                                type: string
+                              hostProcess:
+                                type: boolean
+                              runAsUserName:
+                                type: string
+                            type: object
+                        type: object
+                      stats:
+                        properties:
+                          customLabels:
+                            items:
+                              properties:
+                                keyDelimiter:
+                                  type: string
+                                metadataKey:
+                                  minLength: 1
+                                  type: string
+                                metadataNamespace:
+                                  enum:
+                                  - envoy.filters.http.jwt_authn
+                                  - io.solo.transformation
+                                  type: string
+                                name:
+                                  minLength: 1
+                                  type: string
+                              required:
+                              - metadataKey
+                              - name
+                              type: object
+                            type: array
+                        type: object
+                    type: object
+                  deployment:
+                    properties:
+                      replicas:
+                        format: int32
+                        type: integer
+                    type: object
+                  envoyContainer:
+                    properties:
+                      bootstrap:
+                        properties:
+                          componentLogLevels:
+                            additionalProperties:
+                              type: string
+                            type: object
+                          logLevel:
+                            type: string
+                        type: object
+                      image:
+                        properties:
+                          digest:
+                            type: string
+                          pullPolicy:
+                            type: string
+                          registry:
+                            type: string
+                          repository:
+                            type: string
+                          tag:
+                            type: string
+                        type: object
+                      resources:
+                        properties:
+                          claims:
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                request:
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                          limits:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            type: object
+                          requests:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            type: object
+                        type: object
+                      securityContext:
+                        properties:
+                          allowPrivilegeEscalation:
+                            type: boolean
+                          appArmorProfile:
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - type
+                            type: object
+                          capabilities:
+                            properties:
+                              add:
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              drop:
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
+                            type: object
+                          privileged:
+                            type: boolean
+                          procMount:
+                            type: string
+                          readOnlyRootFilesystem:
+                            type: boolean
+                          runAsGroup:
+                            format: int64
+                            type: integer
+                          runAsNonRoot:
+                            type: boolean
+                          runAsUser:
+                            format: int64
+                            type: integer
+                          seLinuxOptions:
+                            properties:
+                              level:
+                                type: string
+                              role:
+                                type: string
+                              type:
+                                type: string
+                              user:
+                                type: string
+                            type: object
+                          seccompProfile:
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - type
+                            type: object
+                          windowsOptions:
+                            properties:
+                              gmsaCredentialSpec:
+                                type: string
+                              gmsaCredentialSpecName:
+                                type: string
+                              hostProcess:
+                                type: boolean
+                              runAsUserName:
+                                type: string
+                            type: object
+                        type: object
+                    type: object
+                  floatingUserId:
+                    type: boolean
+                  istio:
+                    properties:
+                      customSidecars:
+                        items:
+                          properties:
+                            args:
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            command:
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            env:
+                              items:
+                                properties:
+                                  name:
+                                    type: string
+                                  value:
+                                    type: string
+                                  valueFrom:
+                                    properties:
+                                      configMapKeyRef:
+                                        properties:
+                                          key:
+                                            type: string
+                                          name:
+                                            default: ""
+                                            type: string
+                                          optional:
+                                            type: boolean
+                                        required:
+                                        - key
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                      fieldRef:
+                                        properties:
+                                          apiVersion:
+                                            type: string
+                                          fieldPath:
+                                            type: string
+                                        required:
+                                        - fieldPath
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                      resourceFieldRef:
+                                        properties:
+                                          containerName:
+                                            type: string
+                                          divisor:
+                                            anyOf:
+                                            - type: integer
+                                            - type: string
+                                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                            x-kubernetes-int-or-string: true
+                                          resource:
+                                            type: string
+                                        required:
+                                        - resource
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                      secretKeyRef:
+                                        properties:
+                                          key:
+                                            type: string
+                                          name:
+                                            default: ""
+                                            type: string
+                                          optional:
+                                            type: boolean
+                                        required:
+                                        - key
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                    type: object
+                                required:
+                                - name
+                                type: object
+                              type: array
+                              x-kubernetes-list-map-keys:
+                              - name
+                              x-kubernetes-list-type: map
+                            envFrom:
+                              items:
+                                properties:
+                                  configMapRef:
+                                    properties:
+                                      name:
+                                        default: ""
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                  prefix:
+                                    type: string
+                                  secretRef:
+                                    properties:
+                                      name:
+                                        default: ""
+                                        type: string
+                                      optional:
+                                        type: boolean
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            image:
+                              type: string
+                            imagePullPolicy:
+                              type: string
+                            lifecycle:
+                              properties:
+                                postStart:
+                                  properties:
+                                    exec:
+                                      properties:
+                                        command:
+                                          items:
+                                            type: string
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                      type: object
+                                    httpGet:
+                                      properties:
+                                        host:
+                                          type: string
+                                        httpHeaders:
+                                          items:
+                                            properties:
+                                              name:
+                                                type: string
+                                              value:
+                                                type: string
+                                            required:
+                                            - name
+                                            - value
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        path:
+                                          type: string
+                                        port:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          x-kubernetes-int-or-string: true
+                                        scheme:
+                                          type: string
+                                      required:
+                                      - port
+                                      type: object
+                                    sleep:
+                                      properties:
+                                        seconds:
+                                          format: int64
+                                          type: integer
+                                      required:
+                                      - seconds
+                                      type: object
+                                    tcpSocket:
+                                      properties:
+                                        host:
+                                          type: string
+                                        port:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          x-kubernetes-int-or-string: true
+                                      required:
+                                      - port
+                                      type: object
+                                  type: object
+                                preStop:
+                                  properties:
+                                    exec:
+                                      properties:
+                                        command:
+                                          items:
+                                            type: string
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                      type: object
+                                    httpGet:
+                                      properties:
+                                        host:
+                                          type: string
+                                        httpHeaders:
+                                          items:
+                                            properties:
+                                              name:
+                                                type: string
+                                              value:
+                                                type: string
+                                            required:
+                                            - name
+                                            - value
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        path:
+                                          type: string
+                                        port:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          x-kubernetes-int-or-string: true
+                                        scheme:
+                                          type: string
+                                      required:
+                                      - port
+                                      type: object
+                                    sleep:
+                                      properties:
+                                        seconds:
+                                          format: int64
+                                          type: integer
+                                      required:
+                                      - seconds
+                                      type: object
+                                    tcpSocket:
+                                      properties:
+                                        host:
+                                          type: string
+                                        port:
+                                          anyOf:
+                                          - type: integer
+                                          - type: string
+                                          x-kubernetes-int-or-string: true
+                                      required:
+                                      - port
+                                      type: object
+                                  type: object
+                              type: object
+                            livenessProbe:
+                              properties:
+                                exec:
+                                  properties:
+                                    command:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                  type: object
+                                failureThreshold:
+                                  format: int32
+                                  type: integer
+                                grpc:
+                                  properties:
+                                    port:
+                                      format: int32
+                                      type: integer
+                                    service:
+                                      default: ""
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
+                                httpGet:
+                                  properties:
+                                    host:
+                                      type: string
+                                    httpHeaders:
+                                      items:
+                                        properties:
+                                          name:
+                                            type: string
+                                          value:
+                                            type: string
+                                        required:
+                                        - name
+                                        - value
+                                        type: object
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    path:
+                                      type: string
+                                    port:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      x-kubernetes-int-or-string: true
+                                    scheme:
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
+                                initialDelaySeconds:
+                                  format: int32
+                                  type: integer
+                                periodSeconds:
+                                  format: int32
+                                  type: integer
+                                successThreshold:
+                                  format: int32
+                                  type: integer
+                                tcpSocket:
+                                  properties:
+                                    host:
+                                      type: string
+                                    port:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      x-kubernetes-int-or-string: true
+                                  required:
+                                  - port
+                                  type: object
+                                terminationGracePeriodSeconds:
+                                  format: int64
+                                  type: integer
+                                timeoutSeconds:
+                                  format: int32
+                                  type: integer
+                              type: object
+                            name:
+                              type: string
+                            ports:
+                              items:
+                                properties:
+                                  containerPort:
+                                    format: int32
+                                    type: integer
+                                  hostIP:
+                                    type: string
+                                  hostPort:
+                                    format: int32
+                                    type: integer
+                                  name:
+                                    type: string
+                                  protocol:
+                                    default: TCP
+                                    type: string
+                                required:
+                                - containerPort
+                                type: object
+                              type: array
+                              x-kubernetes-list-map-keys:
+                              - containerPort
+                              - protocol
+                              x-kubernetes-list-type: map
+                            readinessProbe:
+                              properties:
+                                exec:
+                                  properties:
+                                    command:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                  type: object
+                                failureThreshold:
+                                  format: int32
+                                  type: integer
+                                grpc:
+                                  properties:
+                                    port:
+                                      format: int32
+                                      type: integer
+                                    service:
+                                      default: ""
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
+                                httpGet:
+                                  properties:
+                                    host:
+                                      type: string
+                                    httpHeaders:
+                                      items:
+                                        properties:
+                                          name:
+                                            type: string
+                                          value:
+                                            type: string
+                                        required:
+                                        - name
+                                        - value
+                                        type: object
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    path:
+                                      type: string
+                                    port:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      x-kubernetes-int-or-string: true
+                                    scheme:
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
+                                initialDelaySeconds:
+                                  format: int32
+                                  type: integer
+                                periodSeconds:
+                                  format: int32
+                                  type: integer
+                                successThreshold:
+                                  format: int32
+                                  type: integer
+                                tcpSocket:
+                                  properties:
+                                    host:
+                                      type: string
+                                    port:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      x-kubernetes-int-or-string: true
+                                  required:
+                                  - port
+                                  type: object
+                                terminationGracePeriodSeconds:
+                                  format: int64
+                                  type: integer
+                                timeoutSeconds:
+                                  format: int32
+                                  type: integer
+                              type: object
+                            resizePolicy:
+                              items:
+                                properties:
+                                  resourceName:
+                                    type: string
+                                  restartPolicy:
+                                    type: string
+                                required:
+                                - resourceName
+                                - restartPolicy
+                                type: object
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            resources:
+                              properties:
+                                claims:
+                                  items:
+                                    properties:
+                                      name:
+                                        type: string
+                                      request:
+                                        type: string
+                                    required:
+                                    - name
+                                    type: object
+                                  type: array
+                                  x-kubernetes-list-map-keys:
+                                  - name
+                                  x-kubernetes-list-type: map
+                                limits:
+                                  additionalProperties:
+                                    anyOf:
+                                    - type: integer
+                                    - type: string
+                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                    x-kubernetes-int-or-string: true
+                                  type: object
+                                requests:
+                                  additionalProperties:
+                                    anyOf:
+                                    - type: integer
+                                    - type: string
+                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                    x-kubernetes-int-or-string: true
+                                  type: object
+                              type: object
+                            restartPolicy:
+                              type: string
+                            securityContext:
+                              properties:
+                                allowPrivilegeEscalation:
+                                  type: boolean
+                                appArmorProfile:
+                                  properties:
+                                    localhostProfile:
+                                      type: string
+                                    type:
+                                      type: string
+                                  required:
+                                  - type
+                                  type: object
+                                capabilities:
+                                  properties:
+                                    add:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    drop:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                  type: object
+                                privileged:
+                                  type: boolean
+                                procMount:
+                                  type: string
+                                readOnlyRootFilesystem:
+                                  type: boolean
+                                runAsGroup:
+                                  format: int64
+                                  type: integer
+                                runAsNonRoot:
+                                  type: boolean
+                                runAsUser:
+                                  format: int64
+                                  type: integer
+                                seLinuxOptions:
+                                  properties:
+                                    level:
+                                      type: string
+                                    role:
+                                      type: string
+                                    type:
+                                      type: string
+                                    user:
+                                      type: string
+                                  type: object
+                                seccompProfile:
+                                  properties:
+                                    localhostProfile:
+                                      type: string
+                                    type:
+                                      type: string
+                                  required:
+                                  - type
+                                  type: object
+                                windowsOptions:
+                                  properties:
+                                    gmsaCredentialSpec:
+                                      type: string
+                                    gmsaCredentialSpecName:
+                                      type: string
+                                    hostProcess:
+                                      type: boolean
+                                    runAsUserName:
+                                      type: string
+                                  type: object
+                              type: object
+                            startupProbe:
+                              properties:
+                                exec:
+                                  properties:
+                                    command:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                  type: object
+                                failureThreshold:
+                                  format: int32
+                                  type: integer
+                                grpc:
+                                  properties:
+                                    port:
+                                      format: int32
+                                      type: integer
+                                    service:
+                                      default: ""
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
+                                httpGet:
+                                  properties:
+                                    host:
+                                      type: string
+                                    httpHeaders:
+                                      items:
+                                        properties:
+                                          name:
+                                            type: string
+                                          value:
+                                            type: string
+                                        required:
+                                        - name
+                                        - value
+                                        type: object
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    path:
+                                      type: string
+                                    port:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      x-kubernetes-int-or-string: true
+                                    scheme:
+                                      type: string
+                                  required:
+                                  - port
+                                  type: object
+                                initialDelaySeconds:
+                                  format: int32
+                                  type: integer
+                                periodSeconds:
+                                  format: int32
+                                  type: integer
+                                successThreshold:
+                                  format: int32
+                                  type: integer
+                                tcpSocket:
+                                  properties:
+                                    host:
+                                      type: string
+                                    port:
+                                      anyOf:
+                                      - type: integer
+                                      - type: string
+                                      x-kubernetes-int-or-string: true
+                                  required:
+                                  - port
+                                  type: object
+                                terminationGracePeriodSeconds:
+                                  format: int64
+                                  type: integer
+                                timeoutSeconds:
+                                  format: int32
+                                  type: integer
+                              type: object
+                            stdin:
+                              type: boolean
+                            stdinOnce:
+                              type: boolean
+                            terminationMessagePath:
+                              type: string
+                            terminationMessagePolicy:
+                              type: string
+                            tty:
+                              type: boolean
+                            volumeDevices:
+                              items:
+                                properties:
+                                  devicePath:
+                                    type: string
+                                  name:
+                                    type: string
+                                required:
+                                - devicePath
+                                - name
+                                type: object
+                              type: array
+                              x-kubernetes-list-map-keys:
+                              - devicePath
+                              x-kubernetes-list-type: map
+                            volumeMounts:
+                              items:
+                                properties:
+                                  mountPath:
+                                    type: string
+                                  mountPropagation:
+                                    type: string
+                                  name:
+                                    type: string
+                                  readOnly:
+                                    type: boolean
+                                  recursiveReadOnly:
+                                    type: string
+                                  subPath:
+                                    type: string
+                                  subPathExpr:
+                                    type: string
+                                required:
+                                - mountPath
+                                - name
+                                type: object
+                              type: array
+                              x-kubernetes-list-map-keys:
+                              - mountPath
+                              x-kubernetes-list-type: map
+                            workingDir:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                      istioProxyContainer:
+                        properties:
+                          image:
+                            properties:
+                              digest:
+                                type: string
+                              pullPolicy:
+                                type: string
+                              registry:
+                                type: string
+                              repository:
+                                type: string
+                              tag:
+                                type: string
+                            type: object
+                          istioDiscoveryAddress:
+                            type: string
+                          istioMetaClusterId:
+                            type: string
+                          istioMetaMeshId:
+                            type: string
+                          logLevel:
+                            type: string
+                          resources:
+                            properties:
+                              claims:
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                    request:
+                                      type: string
+                                  required:
+                                  - name
+                                  type: object
+                                type: array
+                                x-kubernetes-list-map-keys:
+                                - name
+                                x-kubernetes-list-type: map
+                              limits:
+                                additionalProperties:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  x-kubernetes-int-or-string: true
+                                type: object
+                              requests:
+                                additionalProperties:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  x-kubernetes-int-or-string: true
+                                type: object
+                            type: object
+                          securityContext:
+                            properties:
+                              allowPrivilegeEscalation:
+                                type: boolean
+                              appArmorProfile:
+                                properties:
+                                  localhostProfile:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                - type
+                                type: object
+                              capabilities:
+                                properties:
+                                  add:
+                                    items:
+                                      type: string
+                                    type: array
+                                    x-kubernetes-list-type: atomic
+                                  drop:
+                                    items:
+                                      type: string
+                                    type: array
+                                    x-kubernetes-list-type: atomic
+                                type: object
+                              privileged:
+                                type: boolean
+                              procMount:
+                                type: string
+                              readOnlyRootFilesystem:
+                                type: boolean
+                              runAsGroup:
+                                format: int64
+                                type: integer
+                              runAsNonRoot:
+                                type: boolean
+                              runAsUser:
+                                format: int64
+                                type: integer
+                              seLinuxOptions:
+                                properties:
+                                  level:
+                                    type: string
+                                  role:
+                                    type: string
+                                  type:
+                                    type: string
+                                  user:
+                                    type: string
+                                type: object
+                              seccompProfile:
+                                properties:
+                                  localhostProfile:
+                                    type: string
+                                  type:
+                                    type: string
+                                required:
+                                - type
+                                type: object
+                              windowsOptions:
+                                properties:
+                                  gmsaCredentialSpec:
+                                    type: string
+                                  gmsaCredentialSpecName:
+                                    type: string
+                                  hostProcess:
+                                    type: boolean
+                                  runAsUserName:
+                                    type: string
+                                type: object
+                            type: object
+                        type: object
+                    type: object
+                  podTemplate:
+                    properties:
+                      affinity:
+                        properties:
+                          nodeAffinity:
+                            properties:
+                              preferredDuringSchedulingIgnoredDuringExecution:
+                                items:
+                                  properties:
+                                    preference:
+                                      properties:
+                                        matchExpressions:
+                                          items:
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        matchFields:
+                                          items:
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    weight:
+                                      format: int32
+                                      type: integer
+                                  required:
+                                  - preference
+                                  - weight
+                                  type: object
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              requiredDuringSchedulingIgnoredDuringExecution:
+                                properties:
+                                  nodeSelectorTerms:
+                                    items:
+                                      properties:
+                                        matchExpressions:
+                                          items:
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        matchFields:
+                                          items:
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    type: array
+                                    x-kubernetes-list-type: atomic
+                                required:
+                                - nodeSelectorTerms
+                                type: object
+                                x-kubernetes-map-type: atomic
+                            type: object
+                          podAffinity:
+                            properties:
+                              preferredDuringSchedulingIgnoredDuringExecution:
+                                items:
+                                  properties:
+                                    podAffinityTerm:
+                                      properties:
+                                        labelSelector:
+                                          properties:
+                                            matchExpressions:
+                                              items:
+                                                properties:
+                                                  key:
+                                                    type: string
+                                                  operator:
+                                                    type: string
+                                                  values:
+                                                    items:
+                                                      type: string
+                                                    type: array
+                                                    x-kubernetes-list-type: atomic
+                                                required:
+                                                - key
+                                                - operator
+                                                type: object
+                                              type: array
+                                              x-kubernetes-list-type: atomic
+                                            matchLabels:
+                                              additionalProperties:
+                                                type: string
+                                              type: object
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        matchLabelKeys:
+                                          items:
+                                            type: string
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        mismatchLabelKeys:
+                                          items:
+                                            type: string
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        namespaceSelector:
+                                          properties:
+                                            matchExpressions:
+                                              items:
+                                                properties:
+                                                  key:
+                                                    type: string
+                                                  operator:
+                                                    type: string
+                                                  values:
+                                                    items:
+                                                      type: string
+                                                    type: array
+                                                    x-kubernetes-list-type: atomic
+                                                required:
+                                                - key
+                                                - operator
+                                                type: object
+                                              type: array
+                                              x-kubernetes-list-type: atomic
+                                            matchLabels:
+                                              additionalProperties:
+                                                type: string
+                                              type: object
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        namespaces:
+                                          items:
+                                            type: string
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        topologyKey:
+                                          type: string
+                                      required:
+                                      - topologyKey
+                                      type: object
+                                    weight:
+                                      format: int32
+                                      type: integer
+                                  required:
+                                  - podAffinityTerm
+                                  - weight
+                                  type: object
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              requiredDuringSchedulingIgnoredDuringExecution:
+                                items:
+                                  properties:
+                                    labelSelector:
+                                      properties:
+                                        matchExpressions:
+                                          items:
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        matchLabels:
+                                          additionalProperties:
+                                            type: string
+                                          type: object
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    matchLabelKeys:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mismatchLabelKeys:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    namespaceSelector:
+                                      properties:
+                                        matchExpressions:
+                                          items:
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        matchLabels:
+                                          additionalProperties:
+                                            type: string
+                                          type: object
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    namespaces:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    topologyKey:
+                                      type: string
+                                  required:
+                                  - topologyKey
+                                  type: object
+                                type: array
+                                x-kubernetes-list-type: atomic
+                            type: object
+                          podAntiAffinity:
+                            properties:
+                              preferredDuringSchedulingIgnoredDuringExecution:
+                                items:
+                                  properties:
+                                    podAffinityTerm:
+                                      properties:
+                                        labelSelector:
+                                          properties:
+                                            matchExpressions:
+                                              items:
+                                                properties:
+                                                  key:
+                                                    type: string
+                                                  operator:
+                                                    type: string
+                                                  values:
+                                                    items:
+                                                      type: string
+                                                    type: array
+                                                    x-kubernetes-list-type: atomic
+                                                required:
+                                                - key
+                                                - operator
+                                                type: object
+                                              type: array
+                                              x-kubernetes-list-type: atomic
+                                            matchLabels:
+                                              additionalProperties:
+                                                type: string
+                                              type: object
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        matchLabelKeys:
+                                          items:
+                                            type: string
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        mismatchLabelKeys:
+                                          items:
+                                            type: string
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        namespaceSelector:
+                                          properties:
+                                            matchExpressions:
+                                              items:
+                                                properties:
+                                                  key:
+                                                    type: string
+                                                  operator:
+                                                    type: string
+                                                  values:
+                                                    items:
+                                                      type: string
+                                                    type: array
+                                                    x-kubernetes-list-type: atomic
+                                                required:
+                                                - key
+                                                - operator
+                                                type: object
+                                              type: array
+                                              x-kubernetes-list-type: atomic
+                                            matchLabels:
+                                              additionalProperties:
+                                                type: string
+                                              type: object
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        namespaces:
+                                          items:
+                                            type: string
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        topologyKey:
+                                          type: string
+                                      required:
+                                      - topologyKey
+                                      type: object
+                                    weight:
+                                      format: int32
+                                      type: integer
+                                  required:
+                                  - podAffinityTerm
+                                  - weight
+                                  type: object
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              requiredDuringSchedulingIgnoredDuringExecution:
+                                items:
+                                  properties:
+                                    labelSelector:
+                                      properties:
+                                        matchExpressions:
+                                          items:
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        matchLabels:
+                                          additionalProperties:
+                                            type: string
+                                          type: object
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    matchLabelKeys:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mismatchLabelKeys:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    namespaceSelector:
+                                      properties:
+                                        matchExpressions:
+                                          items:
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                          x-kubernetes-list-type: atomic
+                                        matchLabels:
+                                          additionalProperties:
+                                            type: string
+                                          type: object
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    namespaces:
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    topologyKey:
+                                      type: string
+                                  required:
+                                  - topologyKey
+                                  type: object
+                                type: array
+                                x-kubernetes-list-type: atomic
+                            type: object
+                        type: object
+                      extraAnnotations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      extraLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      gracefulShutdown:
+                        properties:
+                          enabled:
+                            type: boolean
+                          sleepTimeSeconds:
+                            type: integer
+                        type: object
+                      imagePullSecrets:
+                        items:
+                          properties:
+                            name:
+                              default: ""
+                              type: string
+                          type: object
+                          x-kubernetes-map-type: atomic
+                        type: array
+                      livenessProbe:
+                        properties:
+                          exec:
+                            properties:
+                              command:
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
+                            type: object
+                          failureThreshold:
+                            format: int32
+                            type: integer
+                          grpc:
+                            properties:
+                              port:
+                                format: int32
+                                type: integer
+                              service:
+                                default: ""
+                                type: string
+                            required:
+                            - port
+                            type: object
+                          httpGet:
+                            properties:
+                              host:
+                                type: string
+                              httpHeaders:
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                  - name
+                                  - value
+                                  type: object
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              path:
+                                type: string
+                              port:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                x-kubernetes-int-or-string: true
+                              scheme:
+                                type: string
+                            required:
+                            - port
+                            type: object
+                          initialDelaySeconds:
+                            format: int32
+                            type: integer
+                          periodSeconds:
+                            format: int32
+                            type: integer
+                          successThreshold:
+                            format: int32
+                            type: integer
+                          tcpSocket:
+                            properties:
+                              host:
+                                type: string
+                              port:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                x-kubernetes-int-or-string: true
+                            required:
+                            - port
+                            type: object
+                          terminationGracePeriodSeconds:
+                            format: int64
+                            type: integer
+                          timeoutSeconds:
+                            format: int32
+                            type: integer
+                        type: object
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      readinessProbe:
+                        properties:
+                          exec:
+                            properties:
+                              command:
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
+                            type: object
+                          failureThreshold:
+                            format: int32
+                            type: integer
+                          grpc:
+                            properties:
+                              port:
+                                format: int32
+                                type: integer
+                              service:
+                                default: ""
+                                type: string
+                            required:
+                            - port
+                            type: object
+                          httpGet:
+                            properties:
+                              host:
+                                type: string
+                              httpHeaders:
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                    value:
+                                      type: string
+                                  required:
+                                  - name
+                                  - value
+                                  type: object
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              path:
+                                type: string
+                              port:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                x-kubernetes-int-or-string: true
+                              scheme:
+                                type: string
+                            required:
+                            - port
+                            type: object
+                          initialDelaySeconds:
+                            format: int32
+                            type: integer
+                          periodSeconds:
+                            format: int32
+                            type: integer
+                          successThreshold:
+                            format: int32
+                            type: integer
+                          tcpSocket:
+                            properties:
+                              host:
+                                type: string
+                              port:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                x-kubernetes-int-or-string: true
+                            required:
+                            - port
+                            type: object
+                          terminationGracePeriodSeconds:
+                            format: int64
+                            type: integer
+                          timeoutSeconds:
+                            format: int32
+                            type: integer
+                        type: object
+                      securityContext:
+                        properties:
+                          appArmorProfile:
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - type
+                            type: object
+                          fsGroup:
+                            format: int64
+                            type: integer
+                          fsGroupChangePolicy:
+                            type: string
+                          runAsGroup:
+                            format: int64
+                            type: integer
+                          runAsNonRoot:
+                            type: boolean
+                          runAsUser:
+                            format: int64
+                            type: integer
+                          seLinuxChangePolicy:
+                            type: string
+                          seLinuxOptions:
+                            properties:
+                              level:
+                                type: string
+                              role:
+                                type: string
+                              type:
+                                type: string
+                              user:
+                                type: string
+                            type: object
+                          seccompProfile:
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - type
+                            type: object
+                          supplementalGroups:
+                            items:
+                              format: int64
+                              type: integer
+                            type: array
+                            x-kubernetes-list-type: atomic
+                          supplementalGroupsPolicy:
+                            type: string
+                          sysctls:
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                value:
+                                  type: string
+                              required:
+                              - name
+                              - value
+                              type: object
+                            type: array
+                            x-kubernetes-list-type: atomic
+                          windowsOptions:
+                            properties:
+                              gmsaCredentialSpec:
+                                type: string
+                              gmsaCredentialSpecName:
+                                type: string
+                              hostProcess:
+                                type: boolean
+                              runAsUserName:
+                                type: string
+                            type: object
+                        type: object
+                      terminationGracePeriodSeconds:
+                        type: integer
+                      tolerations:
+                        items:
+                          properties:
+                            effect:
+                              type: string
+                            key:
+                              type: string
+                            operator:
+                              type: string
+                            tolerationSeconds:
+                              format: int64
+                              type: integer
+                            value:
+                              type: string
+                          type: object
+                        type: array
+                    type: object
+                  sdsContainer:
+                    properties:
+                      bootstrap:
+                        properties:
+                          logLevel:
+                            type: string
+                        type: object
+                      image:
+                        properties:
+                          digest:
+                            type: string
+                          pullPolicy:
+                            type: string
+                          registry:
+                            type: string
+                          repository:
+                            type: string
+                          tag:
+                            type: string
+                        type: object
+                      resources:
+                        properties:
+                          claims:
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                request:
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                          limits:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            type: object
+                          requests:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            type: object
+                        type: object
+                      securityContext:
+                        properties:
+                          allowPrivilegeEscalation:
+                            type: boolean
+                          appArmorProfile:
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - type
+                            type: object
+                          capabilities:
+                            properties:
+                              add:
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              drop:
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
+                            type: object
+                          privileged:
+                            type: boolean
+                          procMount:
+                            type: string
+                          readOnlyRootFilesystem:
+                            type: boolean
+                          runAsGroup:
+                            format: int64
+                            type: integer
+                          runAsNonRoot:
+                            type: boolean
+                          runAsUser:
+                            format: int64
+                            type: integer
+                          seLinuxOptions:
+                            properties:
+                              level:
+                                type: string
+                              role:
+                                type: string
+                              type:
+                                type: string
+                              user:
+                                type: string
+                            type: object
+                          seccompProfile:
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - type
+                            type: object
+                          windowsOptions:
+                            properties:
+                              gmsaCredentialSpec:
+                                type: string
+                              gmsaCredentialSpecName:
+                                type: string
+                              hostProcess:
+                                type: boolean
+                              runAsUserName:
+                                type: string
+                            type: object
+                        type: object
+                    type: object
+                  service:
+                    properties:
+                      clusterIP:
+                        type: string
+                      extraAnnotations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      extraLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      ports:
+                        items:
+                          properties:
+                            nodePort:
+                              type: integer
+                            port:
+                              type: integer
+                          required:
+                          - port
+                          type: object
+                        type: array
+                      type:
+                        enum:
+                        - ClusterIP
+                        - NodePort
+                        - LoadBalancer
+                        - ExternalName
+                        type: string
+                    type: object
+                  serviceAccount:
+                    properties:
+                      extraAnnotations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      extraLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
+                  stats:
+                    properties:
+                      enableStatsRoute:
+                        type: boolean
+                      enabled:
+                        type: boolean
+                      routePrefixRewrite:
+                        type: string
+                      statsRoutePrefixRewrite:
+                        type: string
+                    type: object
+                type: object
+              selfManaged:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+            type: object
+            x-kubernetes-validations:
+            - message: exactly one of 'kube' or 'selfManaged' must be set
+              rule: 'has(self.kube) ? !has(self.selfManaged) : has(self.selfManaged)'
+          status:
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+# Source: kgateway-crds/templates/gateway.kgateway.dev_httplistenerpolicies.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.5
+  labels:
+    app: kgateway
+    app.kubernetes.io/name: kgateway
+    gateway.networking.k8s.io/policy: Direct
+  name: httplistenerpolicies.gateway.kgateway.dev
+spec:
+  group: gateway.kgateway.dev
+  names:
+    categories:
+    - kgateway
+    kind: HTTPListenerPolicy
+    listKind: HTTPListenerPolicyList
+    plural: httplistenerpolicies
+    singular: httplistenerpolicy
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              accessLog:
+                items:
+                  properties:
+                    fileSink:
+                      properties:
+                        jsonFormat:
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                        path:
+                          type: string
+                        stringFormat:
+                          type: string
+                      required:
+                      - path
+                      type: object
+                      x-kubernetes-validations:
+                      - message: only one of 'StringFormat' or 'JsonFormat' may be
+                          set
+                        rule: (has(self.stringFormat) && !has(self.jsonFormat)) ||
+                          (!has(self.stringFormat) && has(self.jsonFormat))
+                    filter:
+                      allOf:
+                      - maxProperties: 1
+                        minProperties: 1
+                      - maxProperties: 1
+                        minProperties: 1
+                      properties:
+                        andFilter:
+                          items:
+                            maxProperties: 1
+                            minProperties: 1
+                            properties:
+                              celFilter:
+                                properties:
+                                  match:
+                                    type: string
+                                required:
+                                - match
+                                type: object
+                              durationFilter:
+                                properties:
+                                  op:
+                                    enum:
+                                    - EQ
+                                    - GE
+                                    - LE
+                                    type: string
+                                  value:
+                                    format: int32
+                                    maximum: 4294967295
+                                    minimum: 0
+                                    type: integer
+                                required:
+                                - op
+                                type: object
+                              grpcStatusFilter:
+                                properties:
+                                  exclude:
+                                    type: boolean
+                                  statuses:
+                                    items:
+                                      enum:
+                                      - OK
+                                      - CANCELED
+                                      - UNKNOWN
+                                      - INVALID_ARGUMENT
+                                      - DEADLINE_EXCEEDED
+                                      - NOT_FOUND
+                                      - ALREADY_EXISTS
+                                      - PERMISSION_DENIED
+                                      - RESOURCE_EXHAUSTED
+                                      - FAILED_PRECONDITION
+                                      - ABORTED
+                                      - OUT_OF_RANGE
+                                      - UNIMPLEMENTED
+                                      - INTERNAL
+                                      - UNAVAILABLE
+                                      - DATA_LOSS
+                                      - UNAUTHENTICATED
+                                      type: string
+                                    minItems: 1
+                                    type: array
+                                type: object
+                              headerFilter:
+                                properties:
+                                  header:
+                                    properties:
+                                      name:
+                                        maxLength: 256
+                                        minLength: 1
+                                        pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                                        type: string
+                                      type:
+                                        default: Exact
+                                        enum:
+                                        - Exact
+                                        - RegularExpression
+                                        type: string
+                                      value:
+                                        maxLength: 4096
+                                        minLength: 1
+                                        type: string
+                                    required:
+                                    - name
+                                    - value
+                                    type: object
+                                required:
+                                - header
+                                type: object
+                              notHealthCheckFilter:
+                                type: boolean
+                              responseFlagFilter:
+                                properties:
+                                  flags:
+                                    items:
+                                      type: string
+                                    minItems: 1
+                                    type: array
+                                required:
+                                - flags
+                                type: object
+                              statusCodeFilter:
+                                properties:
+                                  op:
+                                    enum:
+                                    - EQ
+                                    - GE
+                                    - LE
+                                    type: string
+                                  value:
+                                    format: int32
+                                    maximum: 4294967295
+                                    minimum: 0
+                                    type: integer
+                                required:
+                                - op
+                                type: object
+                              traceableFilter:
+                                type: boolean
+                            type: object
+                          minItems: 2
+                          type: array
+                        celFilter:
+                          properties:
+                            match:
+                              type: string
+                          required:
+                          - match
+                          type: object
+                        durationFilter:
+                          properties:
+                            op:
+                              enum:
+                              - EQ
+                              - GE
+                              - LE
+                              type: string
+                            value:
+                              format: int32
+                              maximum: 4294967295
+                              minimum: 0
+                              type: integer
+                          required:
+                          - op
+                          type: object
+                        grpcStatusFilter:
+                          properties:
+                            exclude:
+                              type: boolean
+                            statuses:
+                              items:
+                                enum:
+                                - OK
+                                - CANCELED
+                                - UNKNOWN
+                                - INVALID_ARGUMENT
+                                - DEADLINE_EXCEEDED
+                                - NOT_FOUND
+                                - ALREADY_EXISTS
+                                - PERMISSION_DENIED
+                                - RESOURCE_EXHAUSTED
+                                - FAILED_PRECONDITION
+                                - ABORTED
+                                - OUT_OF_RANGE
+                                - UNIMPLEMENTED
+                                - INTERNAL
+                                - UNAVAILABLE
+                                - DATA_LOSS
+                                - UNAUTHENTICATED
+                                type: string
+                              minItems: 1
+                              type: array
+                          type: object
+                        headerFilter:
+                          properties:
+                            header:
+                              properties:
+                                name:
+                                  maxLength: 256
+                                  minLength: 1
+                                  pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                                  type: string
+                                type:
+                                  default: Exact
+                                  enum:
+                                  - Exact
+                                  - RegularExpression
+                                  type: string
+                                value:
+                                  maxLength: 4096
+                                  minLength: 1
+                                  type: string
+                              required:
+                              - name
+                              - value
+                              type: object
+                          required:
+                          - header
+                          type: object
+                        notHealthCheckFilter:
+                          type: boolean
+                        orFilter:
+                          items:
+                            maxProperties: 1
+                            minProperties: 1
+                            properties:
+                              celFilter:
+                                properties:
+                                  match:
+                                    type: string
+                                required:
+                                - match
+                                type: object
+                              durationFilter:
+                                properties:
+                                  op:
+                                    enum:
+                                    - EQ
+                                    - GE
+                                    - LE
+                                    type: string
+                                  value:
+                                    format: int32
+                                    maximum: 4294967295
+                                    minimum: 0
+                                    type: integer
+                                required:
+                                - op
+                                type: object
+                              grpcStatusFilter:
+                                properties:
+                                  exclude:
+                                    type: boolean
+                                  statuses:
+                                    items:
+                                      enum:
+                                      - OK
+                                      - CANCELED
+                                      - UNKNOWN
+                                      - INVALID_ARGUMENT
+                                      - DEADLINE_EXCEEDED
+                                      - NOT_FOUND
+                                      - ALREADY_EXISTS
+                                      - PERMISSION_DENIED
+                                      - RESOURCE_EXHAUSTED
+                                      - FAILED_PRECONDITION
+                                      - ABORTED
+                                      - OUT_OF_RANGE
+                                      - UNIMPLEMENTED
+                                      - INTERNAL
+                                      - UNAVAILABLE
+                                      - DATA_LOSS
+                                      - UNAUTHENTICATED
+                                      type: string
+                                    minItems: 1
+                                    type: array
+                                type: object
+                              headerFilter:
+                                properties:
+                                  header:
+                                    properties:
+                                      name:
+                                        maxLength: 256
+                                        minLength: 1
+                                        pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                                        type: string
+                                      type:
+                                        default: Exact
+                                        enum:
+                                        - Exact
+                                        - RegularExpression
+                                        type: string
+                                      value:
+                                        maxLength: 4096
+                                        minLength: 1
+                                        type: string
+                                    required:
+                                    - name
+                                    - value
+                                    type: object
+                                required:
+                                - header
+                                type: object
+                              notHealthCheckFilter:
+                                type: boolean
+                              responseFlagFilter:
+                                properties:
+                                  flags:
+                                    items:
+                                      type: string
+                                    minItems: 1
+                                    type: array
+                                required:
+                                - flags
+                                type: object
+                              statusCodeFilter:
+                                properties:
+                                  op:
+                                    enum:
+                                    - EQ
+                                    - GE
+                                    - LE
+                                    type: string
+                                  value:
+                                    format: int32
+                                    maximum: 4294967295
+                                    minimum: 0
+                                    type: integer
+                                required:
+                                - op
+                                type: object
+                              traceableFilter:
+                                type: boolean
+                            type: object
+                          minItems: 2
+                          type: array
+                        responseFlagFilter:
+                          properties:
+                            flags:
+                              items:
+                                type: string
+                              minItems: 1
+                              type: array
+                          required:
+                          - flags
+                          type: object
+                        statusCodeFilter:
+                          properties:
+                            op:
+                              enum:
+                              - EQ
+                              - GE
+                              - LE
+                              type: string
+                            value:
+                              format: int32
+                              maximum: 4294967295
+                              minimum: 0
+                              type: integer
+                          required:
+                          - op
+                          type: object
+                        traceableFilter:
+                          type: boolean
+                      type: object
+                    grpcService:
+                      properties:
+                        additionalRequestHeadersToLog:
+                          items:
+                            type: string
+                          type: array
+                        additionalResponseHeadersToLog:
+                          items:
+                            type: string
+                          type: array
+                        additionalResponseTrailersToLog:
+                          items:
+                            type: string
+                          type: array
+                        backendRef:
+                          properties:
+                            group:
+                              default: ""
+                              maxLength: 253
+                              pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                              type: string
+                            kind:
+                              default: Service
+                              maxLength: 63
+                              minLength: 1
+                              pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                              type: string
+                            name:
+                              maxLength: 253
+                              minLength: 1
+                              type: string
+                            namespace:
+                              maxLength: 63
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                            port:
+                              format: int32
+                              maximum: 65535
+                              minimum: 1
+                              type: integer
+                            weight:
+                              default: 1
+                              format: int32
+                              maximum: 1000000
+                              minimum: 0
+                              type: integer
+                          required:
+                          - name
+                          type: object
+                          x-kubernetes-validations:
+                          - message: Must have port for Service reference
+                            rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                              ? has(self.port) : true'
+                        logName:
+                          type: string
+                      required:
+                      - backendRef
+                      - logName
+                      type: object
+                  type: object
+                type: array
+              targetRefs:
+                items:
+                  properties:
+                    group:
+                      maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
+                    kind:
+                      maxLength: 63
+                      minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                      type: string
+                    name:
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                  required:
+                  - group
+                  - kind
+                  - name
+                  type: object
+                maxItems: 16
+                minItems: 1
+                type: array
+            type: object
+          status:
+            properties:
+              conditions:
+                items:
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                maxItems: 8
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+# Source: kgateway-crds/templates/gateway.kgateway.dev_trafficpolicies.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.5
+  labels:
+    app: kgateway
+    app.kubernetes.io/name: kgateway
+    gateway.networking.k8s.io/policy: Direct
+  name: trafficpolicies.gateway.kgateway.dev
+spec:
+  group: gateway.kgateway.dev
+  names:
+    categories:
+    - kgateway
+    kind: TrafficPolicy
+    listKind: TrafficPolicyList
+    plural: trafficpolicies
+    singular: trafficpolicy
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              ai:
+                properties:
+                  defaults:
+                    items:
+                      properties:
+                        field:
+                          minLength: 1
+                          type: string
+                        override:
+                          default: false
+                          type: boolean
+                        value:
+                          minLength: 1
+                          type: string
+                      required:
+                      - field
+                      - value
+                      type: object
+                    type: array
+                  promptEnrichment:
+                    properties:
+                      append:
+                        items:
+                          properties:
+                            content:
+                              type: string
+                            role:
+                              type: string
+                          required:
+                          - content
+                          - role
+                          type: object
+                        type: array
+                      prepend:
+                        items:
+                          properties:
+                            content:
+                              type: string
+                            role:
+                              type: string
+                          required:
+                          - content
+                          - role
+                          type: object
+                        type: array
+                    type: object
+                  promptGuard:
+                    properties:
+                      request:
+                        properties:
+                          customResponse:
+                            properties:
+                              message:
+                                default: The request was rejected due to inappropriate
+                                  content
+                                type: string
+                              statusCode:
+                                default: 403
+                                format: int32
+                                maximum: 599
+                                minimum: 200
+                                type: integer
+                            type: object
+                          moderation:
+                            properties:
+                              openAIModeration:
+                                properties:
+                                  authToken:
+                                    properties:
+                                      inline:
+                                        type: string
+                                      kind:
+                                        enum:
+                                        - Inline
+                                        - SecretRef
+                                        - Passthrough
+                                        type: string
+                                      secretRef:
+                                        properties:
+                                          name:
+                                            default: ""
+                                            type: string
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                    required:
+                                    - kind
+                                    type: object
+                                  model:
+                                    type: string
+                                required:
+                                - authToken
+                                type: object
+                            type: object
+                          regex:
+                            properties:
+                              action:
+                                default: MASK
+                                type: string
+                              builtins:
+                                items:
+                                  enum:
+                                  - SSN
+                                  - CREDIT_CARD
+                                  - PHONE_NUMBER
+                                  - EMAIL
+                                  type: string
+                                type: array
+                              matches:
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                    pattern:
+                                      type: string
+                                  type: object
+                                type: array
+                            type: object
+                          webhook:
+                            properties:
+                              forwardHeaders:
+                                items:
+                                  properties:
+                                    name:
+                                      maxLength: 256
+                                      minLength: 1
+                                      pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                                      type: string
+                                    type:
+                                      default: Exact
+                                      enum:
+                                      - Exact
+                                      - RegularExpression
+                                      type: string
+                                    value:
+                                      maxLength: 4096
+                                      minLength: 1
+                                      type: string
+                                  required:
+                                  - name
+                                  - value
+                                  type: object
+                                type: array
+                              host:
+                                properties:
+                                  host:
+                                    minLength: 1
+                                    type: string
+                                  port:
+                                    format: int32
+                                    maximum: 65535
+                                    minimum: 1
+                                    type: integer
+                                required:
+                                - host
+                                - port
+                                type: object
+                            required:
+                            - host
+                            type: object
+                        type: object
+                      response:
+                        properties:
+                          regex:
+                            properties:
+                              action:
+                                default: MASK
+                                type: string
+                              builtins:
+                                items:
+                                  enum:
+                                  - SSN
+                                  - CREDIT_CARD
+                                  - PHONE_NUMBER
+                                  - EMAIL
+                                  type: string
+                                type: array
+                              matches:
+                                items:
+                                  properties:
+                                    name:
+                                      type: string
+                                    pattern:
+                                      type: string
+                                  type: object
+                                type: array
+                            type: object
+                          webhook:
+                            properties:
+                              forwardHeaders:
+                                items:
+                                  properties:
+                                    name:
+                                      maxLength: 256
+                                      minLength: 1
+                                      pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
+                                      type: string
+                                    type:
+                                      default: Exact
+                                      enum:
+                                      - Exact
+                                      - RegularExpression
+                                      type: string
+                                    value:
+                                      maxLength: 4096
+                                      minLength: 1
+                                      type: string
+                                  required:
+                                  - name
+                                  - value
+                                  type: object
+                                type: array
+                              host:
+                                properties:
+                                  host:
+                                    minLength: 1
+                                    type: string
+                                  port:
+                                    format: int32
+                                    maximum: 65535
+                                    minimum: 1
+                                    type: integer
+                                required:
+                                - host
+                                - port
+                                type: object
+                            required:
+                            - host
+                            type: object
+                        type: object
+                    type: object
+                  routeType:
+                    default: CHAT
+                    enum:
+                    - CHAT
+                    - CHAT_STREAMING
+                    type: string
+                type: object
+              extAuth:
+                properties:
+                  contextExtensions:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  enablement:
+                    enum:
+                    - DisableAll
+                    type: string
+                  extensionRef:
+                    properties:
+                      name:
+                        default: ""
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  withRequestBody:
+                    properties:
+                      allowPartialMessage:
+                        type: boolean
+                      maxRequestBytes:
+                        format: int32
+                        minimum: 1
+                        type: integer
+                      packAsBytes:
+                        type: boolean
+                    required:
+                    - maxRequestBytes
+                    type: object
+                type: object
+                x-kubernetes-validations:
+                - message: only one of 'extensionRef' or 'enablement' may be set
+                  rule: (has(self.extensionRef) && !has(self.enablement)) || (!has(self.extensionRef)
+                    && has(self.enablement))
+              extProc:
+                properties:
+                  extensionRef:
+                    properties:
+                      name:
+                        default: ""
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  processingMode:
+                    properties:
+                      requestBodyMode:
+                        default: NONE
+                        enum:
+                        - NONE
+                        - STREAMED
+                        - BUFFERED
+                        - BUFFERED_PARTIAL
+                        - FULL_DUPLEX_STREAMED
+                        type: string
+                      requestHeaderMode:
+                        default: SEND
+                        enum:
+                        - DEFAULT
+                        - SEND
+                        - SKIP
+                        type: string
+                      requestTrailerMode:
+                        default: SKIP
+                        enum:
+                        - DEFAULT
+                        - SEND
+                        - SKIP
+                        type: string
+                      responseBodyMode:
+                        default: NONE
+                        enum:
+                        - NONE
+                        - STREAMED
+                        - BUFFERED
+                        - BUFFERED_PARTIAL
+                        - FULL_DUPLEX_STREAMED
+                        type: string
+                      responseHeaderMode:
+                        default: SEND
+                        enum:
+                        - DEFAULT
+                        - SEND
+                        - SKIP
+                        type: string
+                      responseTrailerMode:
+                        default: SKIP
+                        enum:
+                        - DEFAULT
+                        - SEND
+                        - SKIP
+                        type: string
+                    type: object
+                required:
+                - extensionRef
+                type: object
+              rateLimit:
+                properties:
+                  local:
+                    properties:
+                      tokenBucket:
+                        properties:
+                          fillInterval:
+                            format: duration
+                            type: string
+                          maxTokens:
+                            format: int32
+                            minimum: 1
+                            type: integer
+                          tokensPerFill:
+                            default: 1
+                            format: int32
+                            type: integer
+                        required:
+                        - fillInterval
+                        - maxTokens
+                        type: object
+                    type: object
+                required:
+                - local
+                type: object
+              targetRefs:
+                items:
+                  properties:
+                    group:
+                      maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
+                    kind:
+                      maxLength: 63
+                      minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                      type: string
+                    name:
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                  required:
+                  - group
+                  - kind
+                  - name
+                  type: object
+                maxItems: 16
+                minItems: 1
+                type: array
+              transformation:
+                properties:
+                  request:
+                    properties:
+                      add:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        maxItems: 16
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      body:
+                        properties:
+                          parseAs:
+                            default: AsString
+                            enum:
+                            - AsString
+                            - AsJson
+                            type: string
+                          value:
+                            type: string
+                        required:
+                        - parseAs
+                        type: object
+                      remove:
+                        items:
+                          type: string
+                        maxItems: 16
+                        type: array
+                        x-kubernetes-list-type: set
+                      set:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        maxItems: 16
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                    type: object
+                  response:
+                    properties:
+                      add:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        maxItems: 16
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      body:
+                        properties:
+                          parseAs:
+                            default: AsString
+                            enum:
+                            - AsString
+                            - AsJson
+                            type: string
+                          value:
+                            type: string
+                        required:
+                        - parseAs
+                        type: object
+                      remove:
+                        items:
+                          type: string
+                        maxItems: 16
+                        type: array
+                        x-kubernetes-list-type: set
+                      set:
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        maxItems: 16
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                    type: object
+                type: object
+            type: object
+          status:
+            properties:
+              conditions:
+                items:
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                maxItems: 8
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

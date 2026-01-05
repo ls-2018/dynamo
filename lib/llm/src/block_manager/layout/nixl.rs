@@ -110,6 +110,7 @@ pub trait NixlLayout: BlockLayout + ToSerializedNixlBlockLayout {
     /// Register the layout with an NIXL agent
     ///
     /// This will register all the individual memory regions associated with the [BlockLayout].
+    /// 向 NIXL 运行时注册内存区域
     fn nixl_register(
         &mut self,
         agent: &NixlAgent,

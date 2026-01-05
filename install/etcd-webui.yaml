@@ -1,0 +1,74 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: e3w-deployment
+  namespace: dynamo-system
+  labels:
+    app: e3w
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etcd-client-e3w
+  template:
+    metadata:
+      labels:
+        app: etcd-client-e3w
+    spec:
+      containers:
+        - name: e3w-app-container
+          #            image: soyking/e3w:latest
+          image: ccr.ccs.tencentyun.com/acejilam/ib-dmk7blvfhi:faa1d5710888d979df05525b20aeee8d-latest
+          ports:
+            - name: e3w-server-port
+              containerPort: 8080
+          volumeMounts:
+            - name: e3w-configmap-volume
+              mountPath: /app/conf/config.default.ini
+              subPath: config.default.ini
+      volumes:
+        - name: e3w-configmap-volume
+          configMap:
+            name: e3w-configmap
+            items:
+              - key: e3w-config.default.ini
+                path: config.default.ini
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: e3w-configmap
+  namespace: dynamo-system
+  labels:
+    config: e3w.ini
+data:
+  e3w-config.default.ini: |
+    [app]
+    port=8080
+    auth=false
+    [etcd]
+    root_key=root
+    dir_value=
+    addr=dynamo-platform-etcd.dynamo-system.svc.cluster.local:2379
+    username=
+    password=
+    cert_file=
+    key_file=
+    ca_file=
+
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: e3w-service
+  namespace: dynamo-system
+spec:
+  type: ClusterIP
+  selector:
+    app: etcd-client-e3w
+  ports:
+    - protocol: TCP
+      targetPort: e3w-server-port
+      port: 80

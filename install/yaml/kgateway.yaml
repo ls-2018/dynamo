@@ -1,0 +1,343 @@
+---
+# Source: kgateway/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kgateway
+  namespace: kgateway-system
+  labels:
+    helm.sh/chart: kgateway-v2.0.3
+    kgateway: kgateway
+    app.kubernetes.io/name: kgateway
+    app.kubernetes.io/instance: kgateway
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: kgateway/templates/inf_ext_rbac.yaml
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kgateway-inference-extension
+rules:
+- apiGroups: ["inference.networking.x-k8s.io"]
+  resources: ["inferencemodels"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["inference.networking.x-k8s.io"]
+  resources: ["inferencepools"]
+  verbs: ["get", "watch", "list", "update"]
+- apiGroups: ["discovery.k8s.io"]
+  resources: ["endpointslices"]
+  verbs: ["get", "watch", "list"]
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - clusterroles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+# Source: kgateway/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kgateway
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - secrets
+  - serviceaccounts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - namespaces
+  - nodes
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - gateway.kgateway.dev
+  resources:
+  - backends
+  - directresponses
+  - gatewayextensions
+  - gatewayparameters
+  - httplistenerpolicies
+  - trafficpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - gateway.kgateway.dev
+  resources:
+  - backends/status
+  - directresponses/status
+  - gatewayextensions/status
+  - gatewayparameters/status
+  - httplistenerpolicies/status
+  - trafficpolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - backendtlspolicies
+  - gateways
+  - httproutes
+  - referencegrants
+  - tcproutes
+  - tlsroutes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - backendtlspolicies/status
+  - gatewayclasses/status
+  - gateways/status
+  - httproutes/status
+  - tcproutes/status
+  - tlsroutes/status
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - gatewayclasses
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.istio.io
+  resources:
+  - destinationrules
+  - serviceentries
+  - workloadentries
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - security.istio.io
+  resources:
+  - authorizationpolicies
+  verbs:
+  - get
+  - list
+  - watch
+---
+# Source: kgateway/templates/inf_ext_rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kgateway-inference-extension-role
+subjects:
+- kind: ServiceAccount
+  name: kgateway
+  namespace: kgateway-system
+roleRef:
+  kind: ClusterRole
+  name: kgateway-inference-extension
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kgateway/templates/serviceaccount.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kgateway-role
+subjects:
+- kind: ServiceAccount
+  name: kgateway
+  namespace: kgateway-system
+roleRef:
+  kind: ClusterRole
+  name: kgateway
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kgateway/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kgateway
+  namespace: kgateway-system
+  labels:
+    helm.sh/chart: kgateway-v2.0.3
+    kgateway: kgateway
+    app.kubernetes.io/name: kgateway
+    app.kubernetes.io/instance: kgateway
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+  - name: grpc-xds
+    protocol: TCP
+    port: 9977
+    targetPort: 9977
+  selector:
+    kgateway: kgateway
+    app.kubernetes.io/name: kgateway
+    app.kubernetes.io/instance: kgateway
+---
+# Source: kgateway/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kgateway
+  namespace: kgateway-system
+  labels:
+    helm.sh/chart: kgateway-v2.0.3
+    kgateway: kgateway
+    app.kubernetes.io/name: kgateway
+    app.kubernetes.io/instance: kgateway
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kgateway: kgateway
+      app.kubernetes.io/name: kgateway
+      app.kubernetes.io/instance: kgateway
+  template:
+    metadata:
+      labels:
+        kgateway: kgateway
+        app.kubernetes.io/name: kgateway
+        app.kubernetes.io/instance: kgateway
+    spec:
+      serviceAccountName: kgateway
+      securityContext:
+        {}
+      containers:
+        - name: kgateway
+          securityContext:
+            {}
+          image: "ccr.ccs.tencentyun.com/acejilam/ib-m40eudxnyz:c892b096e1917ee76897424ac12a7592-v2.0.3"
+          # image: "cr.kgateway.dev/kgateway-dev/kgateway:v2.0.3"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9977
+              name: grpc-xds
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 9977
+            timeoutSeconds: 1
+          env:
+            - name: GOMEMLIMIT
+              valueFrom:
+                resourceFieldRef:
+                  divisor: "1"
+                  resource: limits.memory
+            - name: GOMAXPROCS
+              valueFrom:
+                resourceFieldRef:
+                  divisor: "1"
+                  resource: limits.cpu
+            - name: LOG_LEVEL
+              value: "info"
+            - name: KGW_XDS_SERVICE_NAME
+              value: kgateway
+            - name: KGW_XDS_SERVICE_PORT
+              value: "9977"
+            - name: KGW_ENABLE_INFER_EXT
+              value: "true"
+            - name: KGW_DEFAULT_IMAGE_REGISTRY
+              value: cr.kgateway.dev/kgateway-dev
+            - name: KGW_DEFAULT_IMAGE_TAG
+              value: v2.0.3
+            - name: KGW_DEFAULT_IMAGE_PULL_POLICY
+              value: IfNotPresent
+            # TODO: Remove this once the cleanup is done. Required as the gloo-system
+            # namespace is the default namespace and conformance will fail as a result.
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {}

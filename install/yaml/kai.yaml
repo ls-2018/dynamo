@@ -1,0 +1,1826 @@
+---
+# Source: kai-scheduler/templates/priorityclasses/build-preemptible.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: build-preemptible
+value: 75
+---
+# Source: kai-scheduler/templates/priorityclasses/build.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: build
+value: 100
+---
+# Source: kai-scheduler/templates/priorityclasses/inference.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: inference
+value: 125
+---
+# Source: kai-scheduler/templates/priorityclasses/train.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: train
+value: 50
+---
+# Source: kai-scheduler/templates/services/resourcereservation-namespace.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kai-resource-reservation
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: kai-scheduler/templates/services/operator-serviceaccount.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kai-operator
+  namespace: kai-scheduler
+  labels:
+    app: kai-operator
+---
+# Source: kai-scheduler/templates/services/operator-serviceaccount.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kai-operator
+  namespace: kai-scheduler
+  labels:
+    app: kai-operator
+---
+# Source: kai-scheduler/templates/services/resourcereservation-serviceaccount.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kai-resource-reservation
+  namespace: kai-resource-reservation
+---
+# Source: kai-scheduler/templates/rbac/admission.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-admission
+rules:
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+---
+# Source: kai-scheduler/templates/rbac/binder.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-binder
+rules:
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - pods/binding
+  - pods/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - persistentvolumes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/status
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - resource.k8s.io
+  resources:
+  - deviceclasses
+  - resourceslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - resource.k8s.io
+  resources:
+  - resourceclaims
+  - resourceclaims/status
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - bindrequests
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - bindrequests/finalizers
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - bindrequests/status
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csidrivers
+  - csinodes
+  - csistoragecapacities
+  - storageclasses
+  verbs:
+  - get
+  - list
+  - watch
+---
+# Source: kai-scheduler/templates/rbac/nodescaleadjuster.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-node-scale-adjuster
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - pods/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+# Source: kai-scheduler/templates/rbac/operator.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - persistentvolumeclaims
+  - pods
+  - secrets
+  - serviceaccounts
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resourceNames:
+  - kai-podgroup-validation-v2alpha2
+  - kai-queue-validation-v2
+  - mutating-kai-admission
+  - validating-kai-admission
+  resources:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  verbs:
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resourceNames:
+  - queues.scheduling.run.ai
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kai.scheduler
+  resources:
+  - configs
+  - schedulingshards
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kai.scheduler
+  resources:
+  - configs/finalizers
+  - schedulingshards/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - kai.scheduler
+  resources:
+  - configs/status
+  - schedulingshards/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - prometheuses
+  - servicemonitors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - nvidia.com
+  resources:
+  - clusterpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - queues
+  verbs:
+  - get
+  - list
+  - watch
+---
+# Source: kai-scheduler/templates/rbac/podgroupcontroller.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-podgroup-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - pods
+  - pods/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scheduling.k8s.io
+  resources:
+  - priorityclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - podgroups
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - podgroups/status
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+# Source: kai-scheduler/templates/rbac/podgrouper.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-podgrouper
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - pods
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - amlarc.azureml.com
+  resources:
+  - amljobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - amlarc.azureml.com
+  resources:
+  - amljobs/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments/finalizers
+  - replicasets/finalizers
+  - statefulsets/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflows
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflows/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs/finalizers
+  - jobs/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - egx.nvidia.io
+  resources:
+  - spotrequests
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - egx.nvidia.io
+  resources:
+  - spotrequests/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - grove.io
+  resources:
+  - podcliques
+  - podcliquescalinggroups
+  - podcliquesets
+  - podgangsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - grove.io
+  resources:
+  - podcliques/finalizers
+  - podcliquescalinggroups/finalizers
+  - podcliquesets/finalizers
+  - podgangsets/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - jaxjobs
+  - mpijobs
+  - notebooks
+  - pytorchjobs
+  - scheduledworkflows
+  - tfjobs
+  - xgboostjobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - jaxjobs/finalizers
+  - mpijobs/finalizers
+  - notebooks/finalizers
+  - pytorchjobs/finalizers
+  - scheduledworkflows/finalizers
+  - tfjobs/finalizers
+  - xgboostjobs/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - kubevirt.io
+  resources:
+  - virtualmachineinstances
+  - virtualmachines
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - kubevirt.io
+  resources:
+  - virtualmachineinstances/finalizers
+  - virtualmachines/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - leaderworkerset.x-k8s.io
+  resources:
+  - leaderworkersets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - leaderworkerset.x-k8s.io
+  resources:
+  - leaderworkersets/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - machinelearning.seldon.io
+  resources:
+  - seldondeployments
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - machinelearning.seldon.io
+  resources:
+  - seldondeployments/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ray.io
+  resources:
+  - rayclusters
+  - rayjobs
+  - rayservices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ray.io
+  resources:
+  - rayclusters/finalizers
+  - rayjobs/finalizers
+  - rayservices/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - run.ai
+  resources:
+  - distributedinferenceworkloads
+  - distributedworkloads
+  - inferenceworkloads
+  - interactiveworkloads
+  - runaijobs
+  - trainingworkloads
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - run.ai
+  resources:
+  - runaijobs/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - scheduler.grove.io
+  resources:
+  - podgangs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scheduler.grove.io
+  resources:
+  - podgangs/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - scheduling.k8s.io
+  resources:
+  - priorityclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - podgroups
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - configurations
+  - revisions
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - configurations/finalizers
+  - revisions/finalizers
+  - services/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - tekton.dev
+  resources:
+  - pipelineruns
+  - taskruns
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - tekton.dev
+  resources:
+  - pipelineruns/finalizers
+  - taskruns/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - workspace.devfile.io
+  resources:
+  - devworkspaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - workspace.devfile.io
+  resources:
+  - devworkspaces/finalizers
+  verbs:
+  - create
+  - patch
+  - update
+---
+# Source: kai-scheduler/templates/rbac/prometheus-pod.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-prometheus
+rules:                                                                                              
+- apiGroups:                                                                                        
+  - ""                                                                                              
+  resources:                                                                                        
+  - nodes                                                                                           
+  - nodes/metrics
+  - services                                                                                        
+  - endpoints                                                                                       
+  - pods                                                                                            
+  verbs:                                                                                            
+  - get                                                                                             
+  - list                                                                                            
+  - watch                                                                                           
+- apiGroups:                                                                                        
+  - discovery.k8s.io                                                                                
+  resources:                                                                                        
+  - endpointslices                                                                                  
+  verbs:                                                                                            
+  - get                                                                                             
+  - list                                                                                            
+  - watch                                                                                           
+- apiGroups:                                                                                        
+  - networking.k8s.io                                                                               
+  resources:                                                                                        
+  - ingresses                                                                                       
+  verbs:                                                                                            
+  - get                                                                                             
+  - list                                                                                            
+  - watch                                                                                           
+- nonResourceURLs:                                                                                  
+  - /metrics
+  - /metrics/cadvisor
+  verbs:                                                                                            
+  - get
+---
+# Source: kai-scheduler/templates/rbac/queuecontroller.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: queuecontroller
+rules:
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - podgroups
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - queues
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - queues/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - queues/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+# Source: kai-scheduler/templates/rbac/resourcereservation.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-resource-reservation
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+# Source: kai-scheduler/templates/rbac/scheduler.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-scheduler
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - namespaces
+  - nodes
+  - persistentvolumeclaims
+  - persistentvolumes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - pods/status
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/finalizers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kueue.x-k8s.io
+  resources:
+  - topologies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - resource.k8s.io
+  resources:
+  - deviceclasses
+  - resourceclaims
+  - resourceslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scheduling.k8s.io
+  resources:
+  - priorityclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - bindrequests
+  - podgroups/status
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - podgroups
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - queues
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csidrivers
+  - csinodes
+  - csistoragecapacities
+  - storageclasses
+  verbs:
+  - get
+  - list
+  - watch
+---
+# Source: kai-scheduler/templates/rbac/admission-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-admission
+subjects:
+  - kind: ServiceAccount
+    name: admission
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: kai-admission
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/rbac/binder-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-binder
+subjects:
+  - kind: ServiceAccount
+    name: binder
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: kai-binder
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/rbac/nodescaleadjuster-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-node-scale-adjuster
+subjects:
+  - kind: ServiceAccount
+    name: node-scale-adjuster
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: kai-node-scale-adjuster
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/rbac/operator-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-operator
+subjects:
+  - kind: ServiceAccount
+    name: kai-operator
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: kai-operator
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/rbac/podgroupcontroller-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-podgroup-controller
+subjects:
+  - kind: ServiceAccount
+    name: podgroup-controller
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: kai-podgroup-controller
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/rbac/podgrouper-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-podgrouper
+subjects:
+  - kind: ServiceAccount
+    name: pod-grouper
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: kai-podgrouper
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/rbac/prometheus-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-prometheus
+subjects:
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: kai-prometheus
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/rbac/queuecontroller-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-queuecontroller
+subjects:
+- kind: ServiceAccount
+  name: queue-controller
+  namespace: kai-scheduler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: queuecontroller
+---
+# Source: kai-scheduler/templates/rbac/scheduler-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-scheduler
+subjects:
+  - kind: ServiceAccount
+    name: scheduler
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: kai-scheduler
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/rbac/resourcereservation-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kai-resource-reservation
+  namespace: kai-resource-reservation
+subjects:
+  - kind: ServiceAccount
+    name: kai-resource-reservation
+    namespace: kai-resource-reservation
+roleRef:
+  kind: ClusterRole
+  name: kai-resource-reservation
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/services/operator.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kai-operator
+  namespace: kai-scheduler
+  labels:
+    app: kai-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kai-operator
+  template:
+    metadata:
+      labels:
+        app: kai-operator
+    spec:
+      serviceAccountName: kai-operator
+      containers:
+      - name: operator
+        image: ccr.ccs.tencentyun.com/acejilam/ib-ag4sl3r8ot:cabc81f47537e23f75b3e00191734a36-v0.10.3
+        # image: ghcr.io/nvidia/kai-scheduler/operator:v0.10.3
+        imagePullPolicy: IfNotPresent
+        args:
+          - --metrics-bind-address=:8080
+          - --health-probe-bind-address=:8081
+          - --leader-elect=false
+          - --qps=50
+          - --burst=300
+          - --namespace=kai-scheduler
+        env:
+        - name: WATCH_NAMESPACE
+          value: kai-scheduler
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPERATOR_NAME
+          value: "kai-operator"
+        - name: MS_REPOSITORY
+          value: ghcr.io/nvidia/kai-scheduler
+        - name: MS_TAG
+          value: v0.10.3
+        ports:
+        - containerPort: 8080
+          name: metrics
+        - containerPort: 8081
+          name: probe
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+# Source: kai-scheduler/templates/rbac/admission-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/admission.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/rbac/binder-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/binder.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/rbac/nodescaleadjuster-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+  # SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/nodescaleadjuster.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/rbac/operator-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/operator.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/rbac/podgroupcontroller-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+  # SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/podgroupcontroller.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/rbac/podgrouper-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/podgrouper.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/rbac/post-delete-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/post-delete-clusterrole.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/prometheus-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/prometheus-pod.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/queuecontroller.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/rbac/resourcereservation-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+  # SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/resourcereservation.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/rbac/scc.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/scheduler-binding.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/rbac/scheduler.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+#
+# DO NOT EDIT - This file is auto-generated by controller-gen
+# To modify RBAC permissions, edit the +kubebuilder:rbac markers in the source code
+# and run 'make manifests' to regenerate this file.
+---
+# Source: kai-scheduler/templates/services/scalingpod-namespace.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+---
+# Source: kai-scheduler/templates/default-queue.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+    name: default-parent-queue
+    annotations:
+        helm.sh/resource-policy: keep
+spec:
+    resources:
+        cpu:
+            quota: 0
+            limit: -1
+            overQuotaWeight: 1
+        gpu:
+            quota: 0
+            limit: -1
+            overQuotaWeight: 1
+        memory:
+            quota: 0
+            limit: -1
+            overQuotaWeight: 1
+---
+# Source: kai-scheduler/templates/default-queue.yaml
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+    name: default-queue
+    annotations:
+        helm.sh/resource-policy: keep
+spec:
+    parentQueue: default-parent-queue
+    resources:
+        cpu:
+            quota: 0
+            limit: -1
+            overQuotaWeight: 1
+        gpu:
+            quota: 0
+            limit: -1
+            overQuotaWeight: 1
+        memory:
+            quota: 0
+            limit: -1
+            overQuotaWeight: 1
+---
+# Source: kai-scheduler/templates/default-shard.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: kai.scheduler/v1
+kind: SchedulingShard
+metadata:
+  name: default
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  partitionLabelValue: ""
+  placementStrategy:
+    gpu: binpack
+    cpu: binpack
+---
+# Source: kai-scheduler/templates/rbac/crd-manager.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kai-scheduler-crd-manager
+  namespace: kai-scheduler 
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+---
+# Source: kai-scheduler/templates/services/post-delete-serviceaccount.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: post-delete-cleanup
+  namespace: kai-scheduler
+  labels:
+    app: kai-operator
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+---
+# Source: kai-scheduler/templates/rbac/crd-manager.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kai-scheduler-crd-manager
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+rules:
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  resourceNames:
+    - configs.kai.scheduler
+    - schedulingshards.kai.scheduler
+    - bindrequests.scheduling.run.ai
+    - podgroups.scheduling.run.ai
+    - queues.scheduling.run.ai
+    - topologies.kueue.x-k8s.io
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+# Source: kai-scheduler/templates/rbac/post-delete-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: post-delete-cleanup
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+rules:
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - delete
+  - get
+  - list
+  - watch
+---
+# Source: kai-scheduler/templates/rbac/crd-manager.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kai-scheduler-crd-manager
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kai-scheduler-crd-manager
+subjects:
+- kind: ServiceAccount
+  name: kai-scheduler-crd-manager
+  namespace: kai-scheduler
+---
+# Source: kai-scheduler/templates/rbac/post-delete-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: post-delete-cleanup
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+subjects:
+  - kind: ServiceAccount
+    name: post-delete-cleanup
+    namespace: kai-scheduler
+roleRef:
+  kind: ClusterRole
+  name: post-delete-cleanup
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: kai-scheduler/templates/crd-upgrader.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: crd-upgrader
+  namespace: kai-scheduler
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  suspend: true
+  template:
+    metadata:
+      labels:
+        app: crd-upgrader
+    spec:
+      serviceAccountName: kai-scheduler-crd-manager
+      containers:
+      - name: upgrader
+        image: "ccr.ccs.tencentyun.com/acejilam/ib-urhmniw452:54b6d96b351e5a752192d342458edd1c-v0.10.3"
+        # image: "ghcr.io/nvidia/kai-scheduler/crd-upgrader:v0.10.3"
+        imagePullPolicy: IfNotPresent
+      restartPolicy: OnFailure
+---
+# Source: kai-scheduler/templates/post-hooks/post-delete-job.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: post-delete-cleanup
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  suspend: true
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: post-delete-cleanup
+    spec:
+      serviceAccountName: post-delete-cleanup
+      restartPolicy: Never
+      containers:
+        - name: deleter
+          image: "ccr.ccs.tencentyun.com/acejilam/ib-urhmniw452:54b6d96b351e5a752192d342458edd1c-v0.10.3"
+          # image: "ghcr.io/nvidia/kai-scheduler/crd-upgrader:v0.10.3"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Deleting deployments..."
+              kubectl -n kai-scheduler delete deployment --all --ignore-not-found=true
+              echo "Cleanup complete."
+---
+# Source: kai-scheduler/templates/kai-config.yaml
+# Copyright 2025 NVIDIA CORPORATION
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: kai.scheduler/v1
+kind: Config
+metadata:
+  name: kai-config
+  namespace: kai-scheduler
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "3"
+spec:
+  namespace: kai-scheduler
+  global:
+    replicaCount: 1
+
+  binder:
+    service:
+      enabled: true
+      image:
+        name: binder
+        repository: ghcr.io/nvidia/kai-scheduler
+        tag: v0.10.3
+        pullPolicy: IfNotPresent
+    metricsPort: 8080
+    resourceReservation:
+      image:
+        name: resourcereservation
+
+  podGroupController:
+    service:
+      enabled: true
+      image:
+        name: podgroupcontroller
+        repository: ghcr.io/nvidia/kai-scheduler
+        tag: v0.10.3
+        pullPolicy: IfNotPresent
+
+  queueController:
+    service:
+      enabled: true
+      image:
+        name: queuecontroller
+        repository: ghcr.io/nvidia/kai-scheduler
+        tag: v0.10.3
+        pullPolicy: IfNotPresent
+
+  admission:
+    service:
+      enabled: true
+      image:
+        name: admission
+        repository: ghcr.io/nvidia/kai-scheduler
+        tag: v0.10.3
+        pullPolicy: IfNotPresent
+    gpuSharing: false
+    queueLabelSelector: false
+    webhook:
+      port: 443
+      targetPort: 9443
+      probePort: 8081
+      metricsPort: 8080
+    gpuPodRuntimeClassName: nvidia
+
+  nodeScaleAdjuster:
+    service:
+      enabled: false
+      image:
+        name: nodescaleadjuster
+        repository: ghcr.io/nvidia/kai-scheduler
+        tag: v0.10.3
+        pullPolicy: IfNotPresent
+    args:
+      nodeScaleNamespace: kai-scale-adjust
+      scalingPodImage:
+        name: scalingpod
+        repository: ghcr.io/nvidia/kai-scheduler
+        tag: v0.10.3
+        pullPolicy: IfNotPresent
+
+  scheduler:
+    service:
+      image:
+        name: scheduler
+        repository: ghcr.io/nvidia/kai-scheduler
+        tag: v0.10.3
+        pullPolicy: IfNotPresent
+    schedulerService:
+      port: 8080

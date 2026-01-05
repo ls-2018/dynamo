@@ -190,6 +190,7 @@ impl<Metadata: BlockMetadata> KvBlockManager<locality::Local, Metadata> {
     }
 
     /// Imports a remote blockset configuration from a serialized object.
+    /// 将远程节点的块布局加载到管理器中
     pub fn import_remote_blockset(
         &self,
         serialized_blockset: SerializedNixlBlockSet,

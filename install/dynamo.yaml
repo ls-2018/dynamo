@@ -1,0 +1,1885 @@
+---
+# Source: dynamo-platform/charts/etcd/templates/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: dynamo-platform-etcd
+  namespace: "dynamo-system"
+  labels:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/version: 3.6.4
+    helm.sh/chart: etcd-12.0.18
+    app.kubernetes.io/component: etcd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: dynamo-platform
+      app.kubernetes.io/name: etcd
+      app.kubernetes.io/component: etcd
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    # Allow inbound connections
+    - ports:
+        - port: 2379
+        - port: 2380
+---
+# Source: dynamo-platform/charts/etcd/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dynamo-platform-etcd
+  namespace: "dynamo-system"
+  labels:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/version: 3.6.4
+    helm.sh/chart: etcd-12.0.18
+    app.kubernetes.io/component: etcd
+spec:
+  minAvailable: 51%
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: dynamo-platform
+      app.kubernetes.io/name: etcd
+      app.kubernetes.io/component: etcd
+---
+# Source: dynamo-platform/charts/nats/templates/pod-disruption-budget.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: nats
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/version: 2.11.1
+    helm.sh/chart: nats-1.3.2
+  name: dynamo-platform-nats
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: nats
+      app.kubernetes.io/instance: dynamo-platform
+      app.kubernetes.io/name: nats
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/component-serviceaccount.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dynamo-platform-dynamo-operator-component
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    nvidia.com/dynamo-component-pod: "true"
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    {}
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/serviceaccount.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dynamo-platform-dynamo-operator-controller-manager
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    {}
+---
+# Source: dynamo-platform/charts/etcd/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+automountServiceAccountToken: false
+metadata:
+  name: dynamo-platform-etcd
+  namespace: "dynamo-system"
+  labels:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/version: 3.6.4
+    helm.sh/chart: etcd-12.0.18
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/secret-env.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dynamo-deployment-env
+  namespace: dynamo-system
+  labels:
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+stringData:
+
+  INTERNAL_IMAGES_DEBUGGER: "ccr.ccs.tencentyun.com/acejilam/ib-lh764rgbdj:74d7f6afef5276ca130305846c5b0675-3.12-slim"
+---
+# Source: dynamo-platform/charts/etcd/templates/token-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dynamo-platform-etcd-jwt-token
+  namespace: "dynamo-system"
+  labels:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/version: 3.6.4
+    helm.sh/chart: etcd-12.0.18
+type: Opaque
+data:
+  jwt-token.pem: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlKS0FJQkFBS0NBZ0VBMW5mb3pzTGRsM0NmVmJPQTM5L09QeVVDVkZUcTlndmd6Mk5mQ0F4UWZFY3d5RGJNCllPcFBXdkxKS1RIem43YTY5cTI1SXNJeHpNTGdpeGd1anVDZUJ6R2M3V28vVVdOaVR0b0taWGJmM0tndTVJSkYKL01ydHhMcnFUN1hjeDRydlkyZCs1b2g4d0U0RVltcXlIM2RHY2JrMW1ySzNCNkJNSUQwbXUvbE03K0V3bXlvdAo3SVhnTVh6ZmM0ZzNDYzAyVFRXdUE1MUQ3c3kzWlVDUmYvUWdlWCtaR3JCZGQwSnBXMjl2OU0xUmJvd3B0U21RCkFndjgrUVNHVkh2d3ltanVyLzV6RXNiK2pTWkk0YTJOSTc4bDR1OHlpQnBNVEttQjdKZ2N0MytybCtKY1JPMjEKekZJMXZEL04vellqUHl4c2J4TnRnK3RSVTFyQ3dHejB5Z1NMRzVJSzkxZ3A5SkJUK3NrZ1Y4OUlFTzFhU25RdwpoS0xnYS9zMTV0QWwxTy9EMUdvQlExRW91RUh2WU9ibDJvRTQ1YmkrZFI4ZDR1OXMyemxSQldaek1nOGVPdHZsCm1kN2l2d09YY3ZsM0NkVjJOWUw3NHZZZXBhMTZET1hsaUZ2ZW00cmNsUlJ3V3Q2ZDlzUGRuUEJOZithZjZJMUQKMUJEaklGVm53ME0wNExmZ3FaRy9nRTVJS1U1RHJYQldsL1B5VUsyRVhlQ2xVdm1ZL3hKTStTSW9pVlJ0NVhmNgpyMFdTRGliaTlreGY3SWliNTJXalhaUHRHYll0ZUhYSlZ2MHpZejNtMVdPMktNQzFsWm9SejhIekFqNWN3Q1hoCm5HYTBHOFlYclV2aUh4enhxUDNIZXo2VFZ4UzAraUkwUXV5M0JQN2E2MTY5YzNIZzNVWUJTOEZPdmMwQ0F3RUEKQVFLQ0FnQVJsS0JDckxJbCt4OHdrd2VlTW5ZeGNtcnp0MGRRZG81TjZjOHROWGMyak01b3B5ZFBUWDNHVG84agpYNXNoTFVVN3VlZHFmRUZCVC90QW83R1RXRUhVQktMZ3lsd1k0NXo0S2tMK2FNVjJqTm5WTlFHZ05KRlRsbC9sCk8xcjNCNEpTbzNZQlYxQmtvakNWVWJvNnZwZ0pjLzE3S2ltN1NBNWRlUzNPN0dOOGFYa0d5eWtiRWFsY1hTaGoKQzlnNUp6ZUxram9xeFM0L3FjdmgwcTVxcnZ3bmdZaHZLZVJyaFlmbDdTZGdDYUdpZm41ZndhR3lyVUZtTjFMOApvM0ZNWWxnb21LTGR0KzYvYXROQUhxNHFiejJma2V5U1FCZWZsQ2lZbUtxSDkwRDljUnFQc3UyN2EwVEk0dkVUCnVlQWZTbGkwTFVORnRGbEZERFJaT2tWQnR5Z2c2cTkzeTRpOW0wbXp1dy9VVDJPa2dxa1dUSCtURDFiUDdrZTAKbi9wMENtc2xtaEJjVWt2alFPZFh4c2tia2FsMnp5M2o0cVp4aFlLTDJ3dy9pZVNWSmlzRmQyclRMVTNmemZzSwp2Y05DWVV4WC85cDZTQ2dxVVV6NlZTRk9kREh4YVE4dVJrUWhaN1krVlVWRzVabVlFbDVobkk2cU5rNlRBWUFLCmZvc3F0YmhDVk93dXVNYTZ0VW8xQTJBc0pDb0F5aGpXY2pSaU9sY3d0ZlJ1U0dHcm52MjVFb1ovZFJSMEJaQVgKQ1J5MzNJWWs5a0IwZy8xNGhZMkgxcHU2a3d1WGE1QjBtTXF6aThMa3hOQU04NHpxcmNXMWZtcCtBQmlST1daaApCOFgzVUFTNjN2NUpMREJDbzlCS0d3ZUJMbFJWSUwraGk1anRxYUF3Z0I4RVlGYVErUUtDQVFFQSs0Zm96bHlhCjZOdURQa3c4VHIvdXV6V0pXQ2VlRWVYZVRTandDOFI3Q0N5OTZUNDMyOWpWRmo5bmpMOU9OaUlqWDZrU2huLzEKNVh1bnVwaTBiMG1WbGZpVERVWjhnSE1zRTE4K0FaaDRqNUF6Y2hGT1ZYU3daUVI2NVVrRlB3N1ZqUmt0WGtERgpmNG1TbzJWK25ISWI2dkVBajg2NzBGQzg5MTYwTDl4VElyZXMxWExxOG1QUUlVWWk4Uy9yYUxQS2liby9aV1ZICi9QanR6YUNhYUNTUVRJNlNxY2pQTWtGTHNlYStmOUNMN2VWamp2cUpBRjRqSytsQ0lyR1FsUjBGcFF5K0pVMDYKYnhOTWh6UEZvRERxUHNNc0pqWEk2Nld5RVBzajlGUmdqdnhTQjRDK3lycWxGbHdXMmFzUzZ1U1VFK29rdngzRQpDZURxZENyc29mVGxWUUtDQVFFQTJrZHJ2djRJUURTTXRnN25rQVZoWjNNdUZoS0dEUHpzVmpXRlF6UC9TYnVvCitkODVnYmNyM0x3ZzhmREhneU5waDNtMnhhSDB6dklIa1NnT2lBNHlmcGhjTElmQ3QxYzA0VEZNZFUxWEgySi8KVmFUWXo4Vk13eWxuV1RQSHhIc3BaOTVpWFg5aGlJR1ltbTRVWmQ2MzBUUVZXSmRVL0lYTEJQaVZXQUZUVENKcgpzbmhlZHluUWI4Um5SQXFlTHo2Zkd0WTFjcVVuQWZGQXFkZ2pwWkFoUS9JTU80U0tlZkJkdUNKR2lhNE9CZmRQCmxMQll3U21POUc3cDhYbFZtYjY4RllwQTdZR0Q3TTM0SUYrYkFIM0M2QUZtVjRUVG9hQ3FsbTR1R3J6Vko0UU4KT0t3YnhTNGgwV29iSndIYlgyWUl2dmdOZThkUnltN0NCVlkxKzByMm1RS0NBUUFPZ3UvT2dBODc0ZlkzY09TRgowcEx1WUE5VmM2dXQ4cW9abjRRQjJjc1RWS2w4UEdleW1sYm8ycTJadEN2SitidzZ0NkZtK3hqdnJXdW0yMHFGCnBTUXBLOWNvQytvQTZ5UWUxZjdZenJnZDZEN2ZsTm9GR2g5WEpLUUdlR2tDRTFRRXVQQWlJUENFQkNiZW9HdG0Ka1RyRkdqUmpGNVZFVm5RZ2ZXazkzYU02UElpUEkvc2tFdGdlSTFLK3dYbitaMmtHK3lUUEw4R3dlWmdXcGU1aQpsY0Z4ZVVSQzRWLzYwVU9SdHZORW9uNkFNaHpGVWZUM2ZYYmdBS3dkSGt0dUh1ZUZkeSs5TFRCeTJoVXZNN0J5CkpvQk5NS3RxWk8zN2ttcXNpaUN2NXZKUExZVjZBMVora2JnV2l5ZVNWVWxaSGVqaElVQVBlcU1sd3NFa0JKbjAKV2hHbEFvSUJBUUNnOWxuMkZjNXZ5bENaVUpSaUdCV2orOFBZY3dCM1Eydmtoc01tczRsbURnU2xmbjhoc0xtZgpwUHVHYmxBeDNFTk5xK3VrQWJKTmlSMGJaYmFSamlhZVJDeDBpZ2lFdXNJNzdlYTcrYlJ0YUcwTjh1b1BEU2QyCkkyb2ExWnhTdjUvaEFKVDQ3WjQyMDVwOUJ2L3p2ekUrREhKUlNnZFowQy9PRXFIT3ErdUpFVGpwK3VsdVpsOVcKakRhNmJqb0lETjIzSkk5MVkyUklnbWQwMS9ZeGVQK080MGN4L0tOQkdJZUQ2WUtxdExlU25yVUlxS0pLanlMawpEWVptazFzVWJScTFwNllKZnFDU1Y3REo3cmFXdmlha2Y2UEFsaXFaM2FqdUZZSGFKYlhwMWU4S0E2RFczeFlCCkg0VzJWaUEzVVQ3UjFJbmM1VGJqV0ptcTVkQVk1MGJCQW9JQkFCR0pxc0JVQk93emplSmN3ZGJYeWFlQmJ2dmMKTjE1Z2tmMjhibExiUjNmZmc0cytKcGF6a29hZlJRM3ZzbU92NlBaSkRicTJUdXpZYi9oWldSS0lJbWJwamN3awpxVkpic08wNkRzRGtGTXp0SzVGUmhFdkhhOU5IRmJ6RFgyV25VRTVMamRQVE40Y1I1ZHNyYnJNVE1kdW5DMmN5Cks2VDFPbDhkYU5GQUt5akExNERVU054NTdoVm9mRCtJY1cyMFNjL2lBNGpKRHc3Sm1ueWo1a2VzRVZGK25QR3MKWllueEJiVm5nTEo3eDdsUDU4ZVpzeW04LzlKSU5jM2ZwM1k3OWgrZlpvaEJKQk1SQlhiUWlUbzFaR04xMTUvVQo3NUxwQ3kzRVVVb1VXa0xDZ2wyT2U5K0kvTm9MZ1NmSnQ0NDQ5elhja2wxZkF1WkZlYkh1MkROL09jdz0KLS0tLS1FTkQgUlNBIFBSSVZBVEUgS0VZLS0tLS0K"
+---
+# Source: dynamo-platform/charts/nats/templates/nats-box/contexts-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/component: nats-box
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/version: 2.11.1
+    helm.sh/chart: nats-1.3.2
+  name: dynamo-platform-nats-box-contexts
+stringData:
+  default.json: |
+    {
+      "url": "nats://dynamo-platform-nats"
+    }
+type: Opaque
+---
+# Source: dynamo-platform/charts/nats/templates/config-map.yaml
+apiVersion: v1
+data:
+  nats.conf: |
+    {
+      "http_port": 8222,
+      "jetstream": {
+        "max_memory_store": 0,
+        "store_dir": "/data"
+      },
+      "lame_duck_duration": "30s",
+      "lame_duck_grace_period": "10s",
+      "max_payload": 10485760,
+      "pid_file": "/var/run/nats/nats.pid",
+      "port": 4222,
+      "server_name": $SERVER_NAME
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: nats
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/version: 2.11.1
+    helm.sh/chart: nats-1.3.2
+  name: dynamo-platform-nats-config
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/leader-election-rbac.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dynamo-platform-dynamo-operator-leader-election-role
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/manager-rbac.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dynamo-platform-dynamo-operator-manager-role
+  labels:
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - grove.io
+  resources:
+  - podcliquesets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - grove.io
+  resources:
+  - podcliques/scale
+  - podcliquescalinggroups/scale
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - queues
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - events.k8s.io
+  resources:
+  - events
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - nvidia.com
+  resources:
+  - dynamocomponentdeployments
+  - dynamographdeploymentrequests
+  - dynamographdeployments
+  - dynamomodels
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - nvidia.com
+  resources:
+  - dynamocomponentdeployments/finalizers
+  - dynamographdeploymentrequests/finalizers
+  - dynamographdeployments/finalizers
+  - dynamomodels/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - nvidia.com
+  resources:
+  - dynamocomponentdeployments/status
+  - dynamographdeploymentrequests/status
+  - dynamographdeployments/status
+  - dynamomodels/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - leaderworkerset.x-k8s.io
+  resources:
+  - leaderworkersets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scheduling.volcano.sh
+  resources:
+  - podgroups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/manager-rbac.yaml
+# ClusterRole for kai-scheduler queue access
+# This is always a ClusterRole since Queue resources are cluster-scoped
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dynamo-platform-dynamo-operator-dynamo-system-queue-reader
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - scheduling.run.ai
+  resources:
+  - queues
+  verbs:
+  - get
+  - list
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/planner.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dynamo-platform-dynamo-operator-planner
+  labels:
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups: ["nvidia.com"]
+  resources: ["dynamocomponentdeployments", "dynamographdeployments"]
+  verbs: ["get", "list", "create", "update", "patch"]
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/profiling-job-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dynamo-platform-dynamo-operator-dgdr-profiling
+  labels:
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: dgdr-profiling
+rules:
+# ConfigMaps - needed for saving profiling results
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["create", "get", "update", "patch", "delete"]
+# DynamoGraphDeploymentRequests - needed to get DGDR info
+- apiGroups: ["nvidia.com"]
+  resources: ["dynamographdeploymentrequests"]
+  verbs: ["get"]
+# DynamoGraphDeployments - needed for online profiling to create test deployments
+# The operator will handle creating the actual pods, services, and deployments
+- apiGroups: ["nvidia.com"]
+  resources: ["dynamographdeployments"]
+  verbs: ["get", "create", "delete", "list", "watch"]
+# Pods - needed for listing pods by label selector and getting logs from test deployments
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list", "get", "create", "delete"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/proxy-rbac.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dynamo-platform-dynamo-operator-proxy-role
+  labels:
+    app.kubernetes.io/component: kube-rbac-proxy
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/leader-election-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dynamo-platform-dynamo-operator-leader-election-rolebinding
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: 'dynamo-platform-dynamo-operator-leader-election-role'
+subjects:
+- kind: ServiceAccount
+  name: 'dynamo-platform-dynamo-operator-controller-manager'
+  namespace: 'dynamo-system'
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/manager-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dynamo-platform-dynamo-operator-manager-rolebinding
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: 'dynamo-platform-dynamo-operator-manager-role'
+subjects:
+- kind: ServiceAccount
+  name: 'dynamo-platform-dynamo-operator-controller-manager'
+  namespace: 'dynamo-system'
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/manager-rbac.yaml
+# ClusterRoleBinding for kai-scheduler queue access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dynamo-platform-dynamo-operator-dynamo-system-queue-reader-binding
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dynamo-platform-dynamo-operator-dynamo-system-queue-reader
+subjects:
+- kind: ServiceAccount
+  name: 'dynamo-platform-dynamo-operator-controller-manager'
+  namespace: 'dynamo-system'
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/profiling-job-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dynamo-platform-dynamo-operator-dgdr-profiling
+  labels:
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: dgdr-profiling
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dynamo-platform-dynamo-operator-dgdr-profiling
+subjects:
+- kind: ServiceAccount
+  name: dgdr-profiling-job
+  namespace: dynamo-system
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/proxy-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dynamo-platform-dynamo-operator-proxy-rolebinding
+  labels:
+    app.kubernetes.io/component: kube-rbac-proxy
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: 'dynamo-platform-dynamo-operator-proxy-role'
+subjects:
+- kind: ServiceAccount
+  name: 'dynamo-platform-dynamo-operator-controller-manager'
+  namespace: 'dynamo-system'
+---
+# Source: dynamo-platform/charts/etcd/templates/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: dynamo-platform-etcd-headless
+  namespace: "dynamo-system"
+  labels:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/version: 3.6.4
+    helm.sh/chart: etcd-12.0.18
+    app.kubernetes.io/component: etcd
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: client
+      port: 2379
+      targetPort: client
+    - name: peer
+      port: 2380
+      targetPort: peer
+  selector:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/component: etcd
+---
+# Source: dynamo-platform/charts/etcd/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: dynamo-platform-etcd
+  namespace: "dynamo-system"
+  labels:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/version: 3.6.4
+    helm.sh/chart: etcd-12.0.18
+    app.kubernetes.io/component: etcd
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: "client"
+      port: 2379
+      targetPort: client
+      nodePort: null
+    - name: "peer"
+      port: 2380
+      targetPort: peer
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/component: etcd
+---
+# Source: dynamo-platform/charts/nats/templates/headless-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: nats
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/version: 2.11.1
+    helm.sh/chart: nats-1.3.2
+  name: dynamo-platform-nats-headless
+spec:
+  clusterIP: None
+  ports:
+  - appProtocol: tcp
+    name: nats
+    port: 4222
+    targetPort: nats
+  - appProtocol: http
+    name: monitor
+    port: 8222
+    targetPort: monitor
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/component: nats
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/name: nats
+---
+# Source: dynamo-platform/charts/nats/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: nats
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/version: 2.11.1
+    helm.sh/chart: nats-1.3.2
+  name: dynamo-platform-nats
+spec:
+  ports:
+  - appProtocol: tcp
+    name: nats
+    port: 4222
+    targetPort: nats
+  selector:
+    app.kubernetes.io/component: nats
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/name: nats
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynamo-platform-dynamo-operator-controller-manager
+  labels:
+    app.kubernetes.io/component: manager
+    app.kubernetes.io/created-by: dynamo-operator
+    app.kubernetes.io/part-of: dynamo-operator
+    control-plane: controller-manager
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      control-plane: controller-manager
+      app.kubernetes.io/name: dynamo-operator
+      app.kubernetes.io/instance: dynamo-platform
+  template:
+    metadata:
+      labels:
+        control-plane: controller-manager
+        app.kubernetes.io/name: dynamo-operator
+        app.kubernetes.io/instance: dynamo-platform
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+    spec:
+      containers:
+      - args:
+        - --secure-listen-address=0.0.0.0:8443
+        - --upstream=http://127.0.0.1:8080/
+        - --logtostderr=true
+        - --v=0
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: "cluster.local"
+        image: ccr.ccs.tencentyun.com/acejilam/ib-mxvpwiljub:2875e1419d6934455aec1f5e38193307-v0.15.0
+        # image: gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0
+        name: kube-rbac-proxy
+        ports:
+        - containerPort: 8443
+          name: https
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 5m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      - args:
+          - --health-probe-bind-address=:8081
+          - --metrics-bind-address=127.0.0.1:8080
+          - --leader-elect
+          - --leader-election-id=dynamo.nvidia.com
+          - --leader-election-namespace=kube-system
+          - --natsAddr=nats://dynamo-platform-nats.dynamo-system.svc.cluster.local:4222
+          - --etcdAddr=dynamo-platform-etcd.dynamo-system.svc.cluster.local:2379
+          - --grove-termination-delay=4h
+          - --mpi-run-ssh-secret-name=mpi-run-ssh-secret
+          - --mpi-run-ssh-secret-namespace=dynamo-system
+          - --dgdr-profiling-cluster-role-name=dynamo-platform-dynamo-operator-dgdr-profiling
+          - --planner-cluster-role-name=dynamo-platform-dynamo-operator-planner
+          - --operator-version=0.7.0
+        command:
+        - /manager
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: "cluster.local"
+        envFrom:
+        - secretRef:
+            name: dynamo-deployment-env
+        image: ccr.ccs.tencentyun.com/acejilam/ib-v4qel8dg23:81f7cf1f6479b6d98b7e28cc5c275661-0.7.0
+        # image: nvcr.io/nvidia/ai-dynamo/kubernetes-operator:0.7.0
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: manager
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 1024m
+            memory: 2Gi
+          requests:
+            cpu: 512m
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: dynamo-platform-dynamo-operator-controller-manager
+      terminationGracePeriodSeconds: 30
+---
+# Source: dynamo-platform/charts/nats/templates/nats-box/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: nats-box
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/version: 2.11.1
+    helm.sh/chart: nats-1.3.2
+  name: dynamo-platform-nats-box
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: nats-box
+      app.kubernetes.io/instance: dynamo-platform
+      app.kubernetes.io/name: nats
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: nats-box
+        app.kubernetes.io/instance: dynamo-platform
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: nats
+        app.kubernetes.io/version: 2.11.1
+        helm.sh/chart: nats-1.3.2
+    spec:
+      containers:
+      - args:
+        - sh
+        - -ec
+        - trap true INT TERM; sleep infinity & wait
+        command:
+        - sh
+        - -ec
+        - |
+          work_dir="$(pwd)"
+          mkdir -p "$XDG_CONFIG_HOME/nats"
+          cd "$XDG_CONFIG_HOME/nats"
+          if ! [ -s context ]; then
+            ln -s /etc/nats-contexts context
+          fi
+          if ! [ -f context.txt ]; then
+            echo -n "default" > context.txt
+          fi
+          cd "$work_dir"
+          exec /entrypoint.sh "$@"
+        - --
+        image: dockerproxy.zetyun.cn/ccr.ccs.tencentyun.com/acejilam/ib-hq28x7jgaz:1e0453c9f9c1b36b857e3eea78fbe193-0.14.5
+        # image: dockerproxy.zetyun.cn/docker.io/natsio/nats-box:0.14.5
+        name: nats-box
+        volumeMounts:
+        - mountPath: /etc/nats-contexts
+          name: contexts
+      enableServiceLinks: false
+      tolerations: []
+      volumes:
+      - name: contexts
+        secret:
+          secretName: dynamo-platform-nats-box-contexts
+---
+# Source: dynamo-platform/charts/etcd/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dynamo-platform-etcd
+  namespace: "dynamo-system"
+  labels:
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/version: 3.6.4
+    helm.sh/chart: etcd-12.0.18
+    app.kubernetes.io/component: etcd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: dynamo-platform
+      app.kubernetes.io/name: etcd
+      app.kubernetes.io/component: etcd
+  serviceName: dynamo-platform-etcd-headless
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: dynamo-platform
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: etcd
+        app.kubernetes.io/version: 3.6.4
+        helm.sh/chart: etcd-12.0.18
+        app.kubernetes.io/component: etcd
+      annotations:
+        checksum/token-secret: 2dcd5203c0d24a14176acb3072357dee6b52accec2aa3bd2627c80e79606cf56
+    spec:
+      
+      automountServiceAccountToken: false
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: dynamo-platform
+                    app.kubernetes.io/name: etcd
+                    app.kubernetes.io/component: etcd
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      serviceAccountName: "dynamo-platform-etcd"
+      containers:
+        - name: etcd
+          image: ccr.ccs.tencentyun.com/acejilam/ib-lzyrndm3qf:4614ecd48e013e3081d43e315f1040b3-3.5.18-debian-12-r5
+          # image: docker.io/bitnamilegacy/etcd:3.5.18-debian-12-r5
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_STS_NAME
+              value: "dynamo-platform-etcd"
+            - name: ETCD_ON_K8S
+              value: "yes"
+            - name: ETCD_START_FROM_SNAPSHOT
+              value: "no"
+            - name: ETCD_DISASTER_RECOVERY
+              value: "no"
+            - name: ETCD_NAME
+              value: "$(MY_POD_NAME)"
+            - name: ETCD_DATA_DIR
+              value: "/bitnami/etcd/data"
+            - name: ETCD_LOG_LEVEL
+              value: "info"
+            - name: ALLOW_NONE_AUTHENTICATION
+              value: "yes"
+            - name: ETCD_AUTH_TOKEN
+              value: "jwt,priv-key=/opt/bitnami/etcd/certs/token/jwt-token.pem,sign-method=RS256,ttl=10m"
+            - name: ETCD_ADVERTISE_CLIENT_URLS
+              value: "http://$(MY_POD_NAME).dynamo-platform-etcd-headless.dynamo-system.svc.cluster.local:2379,http://dynamo-platform-etcd.dynamo-system.svc.cluster.local:2379"
+            - name: ETCD_LISTEN_CLIENT_URLS
+              value: "http://0.0.0.0:2379"
+            - name: ETCD_INITIAL_ADVERTISE_PEER_URLS
+              value: "http://$(MY_POD_NAME).dynamo-platform-etcd-headless.dynamo-system.svc.cluster.local:2380"
+            - name: ETCD_LISTEN_PEER_URLS
+              value: "http://0.0.0.0:2380"
+            - name: ETCD_INITIAL_CLUSTER_TOKEN
+              value: "etcd-cluster-k8s"
+            - name: ETCD_INITIAL_CLUSTER
+              value: "dynamo-platform-etcd-0=http://dynamo-platform-etcd-0.dynamo-platform-etcd-headless.dynamo-system.svc.cluster.local:2380"
+            - name: ETCD_CLUSTER_DOMAIN
+              value: "dynamo-platform-etcd-headless.dynamo-system.svc.cluster.local"
+          envFrom:
+          ports:
+            - name: client
+              containerPort: 2379
+              protocol: TCP
+            - name: peer
+              containerPort: 2380
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 375m
+              ephemeral-storage: 2Gi
+              memory: 384Mi
+            requests:
+              cpu: 250m
+              ephemeral-storage: 50Mi
+              memory: 256Mi
+          volumeMounts:
+            - name: empty-dir
+              mountPath: /opt/bitnami/etcd/conf/
+              subPath: app-conf-dir
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: data
+              mountPath: /bitnami/etcd
+            - name: etcd-jwt-token
+              mountPath: /opt/bitnami/etcd/certs/token/
+              readOnly: true
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: etcd-jwt-token
+          secret:
+            secretName: dynamo-platform-etcd-jwt-token
+            defaultMode: 256
+        - name: data
+          emptyDir: {}
+---
+# Source: dynamo-platform/charts/nats/templates/stateful-set.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: nats
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/version: 2.11.1
+    helm.sh/chart: nats-1.3.2
+  name: dynamo-platform-nats
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: nats
+      app.kubernetes.io/instance: dynamo-platform
+      app.kubernetes.io/name: nats
+  serviceName: dynamo-platform-nats-headless
+  template:
+    metadata:
+      annotations:
+        checksum/config: 03f9d5930504a1e00e3fdd2d8dd8e7baabc7dfdefc9540662f8c119be61da127
+      labels:
+        app.kubernetes.io/component: nats
+        app.kubernetes.io/instance: dynamo-platform
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: nats
+        app.kubernetes.io/version: 2.11.1
+        helm.sh/chart: nats-1.3.2
+    spec:
+      containers:
+      - args:
+        - --config
+        - /etc/nats-config/nats.conf
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SERVER_NAME
+          value: $(POD_NAME)
+        image: ccr.ccs.tencentyun.com/acejilam/ib-hy9opcvd5m:5daade9d25ad1903719ef77f6c1d1e66-2.10.21-alpine
+        # image: nats:2.10.21-alpine
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - nats-server
+              - -sl=ldm=/var/run/nats/nats.pid
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz?js-enabled-only=true
+            port: monitor
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: nats
+        ports:
+        - containerPort: 4222
+          name: nats
+        - containerPort: 8222
+          name: monitor
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz?js-server-only=true
+            port: monitor
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        startupProbe:
+          failureThreshold: 90
+          httpGet:
+            path: /healthz
+            port: monitor
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        volumeMounts:
+        - mountPath: /etc/nats-config
+          name: config
+        - mountPath: /var/run/nats
+          name: pid
+      - args:
+        - -pid
+        - /var/run/nats/nats.pid
+        - -config
+        - /etc/nats-config/nats.conf
+        image: ccr.ccs.tencentyun.com/acejilam/ib-y6vrbhjx3m:6db1530ea8baebf3a0d97768a2dc50da-0.16.0
+        # image: natsio/nats-server-config-reloader:0.16.0
+        name: reloader
+        volumeMounts:
+        - mountPath: /var/run/nats
+          name: pid
+        - mountPath: /etc/nats-config
+          name: config
+      enableServiceLinks: false
+      shareProcessNamespace: true
+      tolerations: []
+      volumes:
+      - configMap:
+          name: dynamo-platform-nats-config
+        name: config
+      - emptyDir: {}
+        name: pid
+  volumeClaimTemplates: null
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/deployment.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/metrics-reader-rbac.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/metrics-service.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/planner.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Cluster-wide mode: ClusterRole for planner
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/profiling-job-rbac.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2024-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Cluster-wide mode: ClusterRole for DGDR profiling jobs
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/prometheus.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/regcred-secret.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: dynamo-platform/templates/kai.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/mpi-run-ssh-keygen-job.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dynamo-platform-dynamo-operator-ssh-keygen
+  labels:
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-10"
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/mpi-run-ssh-keygen-job.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dynamo-platform-dynamo-operator-ssh-keygen
+  labels:
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-10"
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "create", "update"]
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/mpi-run-ssh-keygen-job.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dynamo-platform-dynamo-operator-ssh-keygen
+  labels:
+    helm.sh/chart: dynamo-operator-0.7.0
+    app.kubernetes.io/name: dynamo-operator
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/version: "0.7.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-10"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dynamo-platform-dynamo-operator-ssh-keygen
+subjects:
+- kind: ServiceAccount
+  name: dynamo-platform-dynamo-operator-ssh-keygen
+  namespace: dynamo-system
+---
+# Source: dynamo-platform/charts/nats/templates/tests/request-reply.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app.kubernetes.io/component: test-request-reply
+    app.kubernetes.io/instance: dynamo-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/version: 2.11.1
+    helm.sh/chart: nats-1.3.2
+  name: dynamo-platform-nats-test-request-reply
+spec:
+  containers:
+  - args:
+    - sh
+    - -ec
+    - nats reply --echo echo & pid="$!"; sleep 1; nats request echo hi > /tmp/resp;
+      kill "$pid"; wait; grep -qF hi /tmp/resp
+    command:
+    - sh
+    - -ec
+    - |
+      work_dir="$(pwd)"
+      mkdir -p "$XDG_CONFIG_HOME/nats"
+      cd "$XDG_CONFIG_HOME/nats"
+      if ! [ -s context ]; then
+        ln -s /etc/nats-contexts context
+      fi
+      if ! [ -f context.txt ]; then
+        echo -n "default" > context.txt
+      fi
+      cd "$work_dir"
+      exec /entrypoint.sh "$@"
+    - --
+    image: dockerproxy.zetyun.cn/ccr.ccs.tencentyun.com/acejilam/ib-hq28x7jgaz:1e0453c9f9c1b36b857e3eea78fbe193-0.14.5
+    # image: dockerproxy.zetyun.cn/docker.io/natsio/nats-box:0.14.5
+    name: nats-box
+    volumeMounts:
+    - mountPath: /etc/nats-contexts
+      name: contexts
+  enableServiceLinks: false
+  restartPolicy: Never
+  tolerations: []
+  volumes:
+  - name: contexts
+    secret:
+      secretName: dynamo-platform-nats-box-contexts
+---
+# Source: dynamo-platform/charts/dynamo-operator/templates/mpi-run-ssh-keygen-job.yaml
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# This job is used to generate an SSH key pair and create a Kubernetes secret with the key pair.
+# The secret is used when mpi is in use by dynamo workers.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dynamo-platform-dynamo-operator-ssh-keygen
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: dynamo-platform-dynamo-operator-ssh-keygen
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 65534
+      initContainers:
+      - name: keygen
+        image: ccr.ccs.tencentyun.com/acejilam/ib-lzyrndm3qf:87846fbac4fa59fdf099811688de828f-latest
+        # image: bitnamisecure/git:latest
+        volumeMounts:
+        - name: shared
+          mountPath: /shared
+        env:
+        - name: SECRET_NAME
+          value: "mpi-run-ssh-secret"
+        - name: NAMESPACE
+          value: "dynamo-system"
+        command:
+        - /bin/bash
+        - -e
+        - -c
+        - |
+          echo "Generating SSH key pair with ssh-keygen..."
+          ssh-keygen -t rsa -b 2048 -f /shared/private.key -N ""
+          echo "SSH keys generated and saved to shared volume"
+      containers:
+      - name: kubectl-create-secret
+        image: ccr.ccs.tencentyun.com/acejilam/ib-wr0mfuk9d4:02cfda837d3edc5fee5f0fcac8ec12e0-1.34.1
+        # image: alpine/k8s:1.34.1
+        volumeMounts:
+        - name: shared
+          mountPath: /shared
+        env:
+        - name: SECRET_NAME
+          value: "mpi-run-ssh-secret"
+        - name: NAMESPACE
+          value: "dynamo-system"
+        command:
+        - /bin/bash
+        - -e
+        - -c
+        - |
+          # Check if secret already exists
+          if kubectl get secret "$SECRET_NAME" -n "$NAMESPACE" &>/dev/null; then
+            echo "Secret $SECRET_NAME already exists, skipping creation"
+            exit 0
+          fi
+          echo "Creating Kubernetes secret..."
+          kubectl create secret generic "$SECRET_NAME" \
+            --from-file=private.key=/shared/private.key \
+            --from-file=private.key.pub=/shared/private.key.pub \
+            -n "$NAMESPACE"
+          echo "SSH key secret created successfully"
+      volumes:
+      - name: shared
+        emptyDir: {}

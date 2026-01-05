@@ -449,6 +449,7 @@ impl<Metadata: BlockMetadata> KvBlockManagerState<locality::Local, Metadata> {
     }
 
     /// Get a [`Vec<RemoteBlock<IsMutable>>`] from a [`BlockDescriptorList`]
+    /// 从另一个节点获取可传输的内存视图
     pub fn get_remote_blocks_mutable(
         &self,
         bds: &BlockDescriptorList,

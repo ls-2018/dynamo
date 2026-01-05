@@ -16,6 +16,29 @@ services:
       - 4222:4222
       - 6222:6222
       - 8222:8222  # the endpoints include /varz, /healthz, ...
+#    volumes:
+#      - ./nats-server.conf:/nats-server.conf
+    networks:
+      - server
+
+  nats-box:
+    image: natsio/nats-box:0.14.5
+#   nats --user sys --password syspass server list
+    command: [ 'sleep', '1d']
+    volumes:
+      - ./box.txt:/nsc/.config/nats/context.txt
+      - ./box.json:/nsc/.config/nats/context/default.json
+    networks:
+      - server
+
+  nats-web:
+    image: mdawar/nats-dashboard
+    ports:
+      - 8001:80
+    environment:
+      REVERSE_PROXY_UPSTREAM: 'etcd-server:8222'
+      NATS_SERVER_NAME: 'Local NATS Server'
+      NATS_SERVER_URL: 'http://localhost:8001/proxy/'
     networks:
       - server
 
@@ -26,5 +49,35 @@ services:
     ports:
       - 2379:2379  # this port exposes the /metrics endpoint
       - 2380:2380
+    networks:
+      - server
+
+  e3w:
+    #    image: soyking/e3w:latest
+    image: ccr.ccs.tencentyun.com/acejilam/ib-dmk7blvfhi:faa1d5710888d979df05525b20aeee8d-latest
+    volumes:
+      - ./e3w.ini:/app/conf/config.default.ini
+    ports:
+      - 8080:8080
+    networks:
+      - server
+
+  jaeger:
+    #    image: docker.io/jaegertracing/all-in-one
+    image: ccr.ccs.tencentyun.com/acejilam/ib-hq28x7jgaz:96d04a32f09e1c11570e16de8caf3623-latest
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: "9411"
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - 6831:6831
+      - 6832:6832
+      - 5778:5778
+      - 16686:16686   # ✅
+      - 4317:4317
+      - 4318:4318
+      - 14250:14250
+      - 14268:14268
+      - 14269:14269
+      - 9411:9411
     networks:
       - server

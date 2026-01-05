@@ -1,0 +1,4 @@
+{
+  "image": "dynamo:latest-vllm-local-dev",
+  "workspaceFolder": "/dynamo"
+}

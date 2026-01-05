@@ -1,0 +1,16 @@
+impl AsyncEngine<SingleIn<NvCreateEmbeddingRequest>,        ManyOut<Annotated<NvCreateEmbeddingResponse>>,              Error,> for EchoEngine
+impl AsyncEngine<SingleIn<NvCreateCompletionRequest>,       ManyOut<Annotated<NvCreateCompletionResponse>>,             Error,> for EchoEngine
+impl AsyncEngine<SingleIn<NvCreateChatCompletionRequest>,   ManyOut<Annotated<NvCreateChatCompletionStreamResponse>>,   Error,> for EchoEngine
+
+
+
+
+
+# 列出所有服务
+nats service list
+
+# 查看特定服务的统计信息
+nats service stats <service_name>
+
+# 查看服务端点信息
+nats service endpoints <service_name>
