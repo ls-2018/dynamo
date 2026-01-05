@@ -11,23 +11,24 @@ networks:
 services:
   nats-server:
     image: nats:2.11.4
-    command: [ "-js", "--trace", "-m", "8222" ]
+    command: [ "-js", "--trace", "-m", "8222", "-c", "/nats-server.conf" ]
+    volumes:
+      - ./nats-server.conf:/nats-server.conf
+      - ./accounts.conf:/accounts.conf
     ports:
       - 4222:4222
       - 6222:6222
       - 8222:8222  # the endpoints include /varz, /healthz, ...
-#    volumes:
-#      - ./nats-server.conf:/nats-server.conf
     networks:
       - server
 
   nats-box:
     image: natsio/nats-box:0.14.5
-#   nats --user sys --password syspass server list
     command: [ 'sleep', '1d']
     volumes:
       - ./box.txt:/nsc/.config/nats/context.txt
       - ./box.json:/nsc/.config/nats/context/default.json
+      - ./box.json:/root/.config/nats/nats-context.json
     networks:
       - server
 
