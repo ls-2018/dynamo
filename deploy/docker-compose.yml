@@ -11,16 +11,15 @@ networks:
 services:
   nats-server:
     image: nats:2.11.4
-    command: [ "-js", "--trace", "-m", "8222", "-c", "/nats-server.conf" ]
     volumes:
       - ./nats-server.conf:/nats-server.conf
-      - ./accounts.conf:/accounts.conf
     ports:
       - 4222:4222
       - 6222:6222
       - 8222:8222  # the endpoints include /varz, /healthz, ...
     networks:
       - server
+#                                                           192.168.31.14 󰍸  Studio ─╯
 
   nats-box:
     image: natsio/nats-box:0.14.5
