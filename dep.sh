@@ -7,7 +7,17 @@ docker exec -it deploy-nats-box-1 sh -c 'nats server report connections'
 docker exec -it deploy-nats-box-1 sh -c 'nats server report accounts'
 
 # 列出所有 JetStream 流
-docker exec -it deploy-nats-box-1 sh -c 'nats stream ls'
+docker exec -it deploy-nats-box-1 sh -c 'nats stream ls -s nats://user:pass@nats-server:4222'
+# 查看特定流的详细信息（Dynamo 使用的流通常以组件名称命名）
+docker exec -it deploy-nats-box-1 sh -c 'nats stream info namespace-dynamo-component-backend-kv-events -s nats://user:pass@nats-server:4222'
+# 列出所有 JetStream 消费者
+docker exec -it deploy-nats-box-1 sh -c 'nats consumer ls namespace-dynamo-component-backend-kv-events -s nats://user:pass@nats-server:4222'
+
+nats stream info namespace-dynamo-component-backend-kv-events -s nats://user:pass@nats-server:4222
+
+#vllm ----> KvEventPublisher ----> nats  ---->   kv router
+#vllm <---- KvEventPublisher <---- nats  <----   kv router
+
 
 # 连接到本地 NATS 服务器并检查信息
 docker exec -it deploy-nats-box-1 sh -c 'nats server info'
@@ -19,10 +29,7 @@ docker exec -it deploy-nats-box-1 sh -c 'curl -s http://nats-server:8222/subsz'
 
 
 
-# 查看特定流的详细信息（Dynamo 使用的流通常以组件名称命名）
-nats stream info <stream-name> -s nats://user:pass@nats-server:4222
-# 列出所有 JetStream 消费者
-nats consumer ls <stream-name> -s nats://user:pass@nats-server:4222
+
 
 
 

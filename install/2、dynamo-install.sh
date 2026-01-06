@@ -63,6 +63,7 @@ k8s-empty-pod-by-filter.sh
 
 ## to pull model from HF
 export HF_TOKEN=hf-test
+export NAMESPACE=dynamo-system
 kubectl create secret generic hf-token-secret \
   --from-literal=HF_TOKEN="$HF_TOKEN" \
   -n ${NAMESPACE}
