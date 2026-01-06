@@ -194,8 +194,24 @@ If Metal is accessible, you should see an error like `metal: error: no input fil
 
 ### Step 2: Install Rust
 ```
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source $HOME/.cargo/env
+git clone https://github.com/ai-dynamo/dynamo.git -b v0.7.0
+docker tag 74b5eecc662a17697079ff120f2c94c371c2b3f29942963970169ed613661d3d dynamo:latest-vllm-local-dev
+docker run \
+  --rm \
+  -it --gpus=all \
+  --network=host \
+  --ipc=host \
+  --cap-add=SYS_PTRACE \
+  -v /root/dynamo:/workspace \
+  -v ~/data:/home/dynamo/.cache/huggingface \
+  dynamo:latest-vllm-local-dev \
+  bash
+
+rustup target add x86_64-unknown-linux-gnu
+cargo build --features cuda --release --target x86_64-unknown-linux-gnu
+
+
+
 ```
 
 ### Step 3: Build

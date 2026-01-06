@@ -29,43 +29,36 @@ docker exec -it deploy-nats-box-1 sh -c 'curl -s http://nats-server:8222/subsz'
 
 
 
+#
+#use dynamo_runtime::transports::nats::Client;
+#
+##[tokio::main]
+#async fn main() -> Result<(), Box<dyn std::error::Error>> {
+#    // 创建 NATS 客户端
+#    let client = Client::builder().connect().await?;
+#
+#    // 查看服务器信息
+#    println!("NATS server: {}", client.addr());
+#
+#    // 列出所有 JetStream 流
+#    println!("JetStream streams: {:?}", client.list_streams().await?);
+#
+#    // 查看特定流的信息
+#    if let Ok(streams) = client.list_streams().await {
+#        for stream in streams {
+#            println!("Stream: {}", stream);
+#
+#            if let Ok(consumers) = client.list_consumers(&stream).await {
+#                println!("Consumers: {:?}", consumers);
+#            }
+#
+#            if let Ok(info) = client.stream_info(&stream).await {
+#                println!("Stream info: {:?}", info);
+#            }
+#        }
+#    }
+#
+#    Ok(())
+#}
 
 
-
-
-
-
-
-
-
-
-use dynamo_runtime::transports::nats::Client;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // 创建 NATS 客户端
-    let client = Client::builder().connect().await?;
-
-    // 查看服务器信息
-    println!("NATS server: {}", client.addr());
-
-    // 列出所有 JetStream 流
-    println!("JetStream streams: {:?}", client.list_streams().await?);
-
-    // 查看特定流的信息
-    if let Ok(streams) = client.list_streams().await {
-        for stream in streams {
-            println!("Stream: {}", stream);
-
-            if let Ok(consumers) = client.list_consumers(&stream).await {
-                println!("Consumers: {:?}", consumers);
-            }
-
-            if let Ok(info) = client.stream_info(&stream).await {
-                println!("Stream info: {:?}", info);
-            }
-        }
-    }
-
-    Ok(())
-}
