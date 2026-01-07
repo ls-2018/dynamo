@@ -56,7 +56,7 @@ RUN apt-get install -y sudo gnupg2 gnupg1 \
     # Handle GID conflicts: if target GID exists and it's not our group, remove it
     && (getent group $USER_GID | grep -v "^$USERNAME:" && groupdel $(getent group $USER_GID | cut -d: -f1) || true) \
     # Create group if it doesn't exist, otherwise modify existing group
-    && (getent group $USERNAME > /dev/null 2>&1 && groupmod -g $USER_GID $USERNAME || groupadd -g $USER_GID $USERNAME) \
+    && (getent group $USERNAME > /dev/null 2>&1 && groupmod -g $USER_GID $USERNAME || (groupadd -g $USER_GID dynamo ||true)) \
     && usermod -u $USER_UID -g $USER_GID $USERNAME \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME \
     && chsh -s /bin/bash $USERNAME

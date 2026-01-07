@@ -18,7 +18,6 @@ nats stream info namespace-dynamo-component-backend-kv-events -s nats://user:pas
 #vllm ----> KvEventPublisher ----> nats  ---->   kv router
 #vllm <---- KvEventPublisher <---- nats  <----   kv router
 
-
 # 连接到本地 NATS 服务器并检查信息
 docker exec -it deploy-nats-box-1 sh -c 'nats server info'
 
@@ -26,8 +25,6 @@ docker exec -it deploy-nats-box-1 sh -c 'curl -s http://nats-server:8222/'
 docker exec -it deploy-nats-box-1 sh -c 'curl -s http://nats-server:8222/jsz'
 docker exec -it deploy-nats-box-1 sh -c 'curl -s http://nats-server:8222/varz'
 docker exec -it deploy-nats-box-1 sh -c 'curl -s http://nats-server:8222/subsz'
-
-
 
 #
 #use dynamo_runtime::transports::nats::Client;
@@ -61,4 +58,39 @@ docker exec -it deploy-nats-box-1 sh -c 'curl -s http://nats-server:8222/subsz'
 #    Ok(())
 #}
 
+#./build.sh --framework vllm --target local-dev --enable-kvbm --uid 1000
+docker build -f /root/dynamo/container/Dockerfile \
+  --target dev \
+  --platform linux/amd64 \
+  --build-arg DYNAMO_COMMIT_SHA=f49d6873e417ef82090ed492ef00b6939bd5a8d0 \
+  --build-arg NIXL_REF=0.7.1 \
+  --build-arg BASE_IMAGE=nvcr.io/nvidia/cuda-dl-base \
+  --build-arg BASE_IMAGE_TAG=25.01-cuda12.8-devel-ubuntu24.04 \
+  --build-arg ENABLE_KVBM=true \
+  --build-arg NIXL_UCX_REF=v1.19.0 \
+  --tag dynamo-base:v0.7.0 \
+  /root/dynamo
 
+docker build -f /root/dynamo/container/Dockerfile.vllm \
+  --target dev \
+  --platform linux/amd64 \
+  --build-arg DYNAMO_COMMIT_SHA=f49d6873e417ef82090ed492ef00b6939bd5a8d0 \
+  --build-arg NIXL_REF=0.7.1 \
+  --build-arg BASE_IMAGE=nvcr.io/nvidia/cuda-dl-base \
+  --build-arg BASE_IMAGE_TAG=25.01-cuda12.8-devel-ubuntu24.04 \
+  --build-arg ENABLE_KVBM=true \
+  --build-arg NIXL_UCX_REF=v1.19.0 \
+  --build-arg DYNAMO_BASE_IMAGE=dynamo-base:v0.7.0 \
+  --tag dynamo:v0.7.0-vllm \
+  --tag dynamo:latest-vllm \
+  /root/dynamo
+
+docker build \
+  --build-arg DEV_BASE=dynamo:v0.7.0-vllm \
+  --build-arg USER_UID=1000 \
+  --build-arg USER_GID=0 \
+  --build-arg ARCH=amd64 \
+  --file /root/dynamo/container/Dockerfile.local_dev \
+  --tag dynamo:v0.7.0-vllm-local-dev \
+  --tag dynamo:latest-vllm-local-dev \
+  /root/dynamo/container
