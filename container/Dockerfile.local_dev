@@ -58,7 +58,6 @@ RUN apt-get install -y sudo gnupg2 gnupg1 \
     # Create group if it doesn't exist, otherwise modify existing group
     && (getent group $USERNAME > /dev/null 2>&1 && groupmod -g $USER_GID $USERNAME || (groupadd -g $USER_GID dynamo ||true)) \
     && usermod -u $USER_UID -g $USER_GID $USERNAME \
-    && chown -R $USERNAME:$USERNAME /home/$USERNAME \
     && chsh -s /bin/bash $USERNAME
 
 # Install awk separately with fault tolerance

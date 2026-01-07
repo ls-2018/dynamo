@@ -8,3 +8,7 @@ skopeo_copy docker.io/natsio/nats-server-config-reloader:0.16.0 $(trans_image_na
 skopeo_copy docker.io/natsio/nats-box:0.14.5 $(trans_image_name.py docker.io/natsio/nats-box:0.14.5)
 skopeo_copy docker.io/bitnamisecure/git:latest $(trans_image_name.py docker.io/bitnamisecure/git:latest)
 skopeo_copy docker.io/alpine/k8s:1.34.1 $(trans_image_name.py docker.io/alpine/k8s:1.34.1)
+
+
+
+#同一节点内不同 GPU 之间使用张量并行（依赖NVLink 带来的低延迟），不同节点之间使用流水线并行或者专家并行
