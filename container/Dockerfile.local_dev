@@ -11,7 +11,7 @@
 # - Command line: run.sh --image <local-dev-image> --mount-workspace ...
 #   where the ubuntu user inside the container is mapped to your local user login
 
-ARG DEV_BASE=""
+ARG DEV_BASE
 FROM ${DEV_BASE} AS local-dev
 
 # Don't want dynamo to be editable, just change uid and gid.
@@ -59,6 +59,9 @@ RUN apt-get install -y sudo gnupg2 gnupg1 \
     && (getent group $USERNAME > /dev/null 2>&1 && groupmod -g $USER_GID $USERNAME || (groupadd -g $USER_GID dynamo ||true)) \
     && usermod -u $USER_UID -g $USER_GID $USERNAME \
     && chsh -s /bin/bash $USERNAME
+
+#   && chown -R $USERNAME:$USERNAME /home/$USERNAME
+
 
 # Install awk separately with fault tolerance
 # awk is a virtual package with multiple implementations (gawk, mawk, original-awk).
