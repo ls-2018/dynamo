@@ -8,7 +8,8 @@
 *.[Zz][Ii][Pp]      binary
 *.[Tt][Gg][Zz]      binary
 *.fatbin            binary
-
 # Exclude test data files from linguist language detection
 lib/llm/tests/data/** linguist-vendored
 lib/llm/tests/snapshots/** linguist-vendored
+dynamo-cli filter=lfs diff=lfs merge=lfs -text
+dynamo-run filter=lfs diff=lfs merge=lfs -text
