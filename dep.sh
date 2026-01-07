@@ -66,14 +66,13 @@ export current_tag=0.7.0
 #docker build -f /root/dynamo/container/Dockerfile.vllm --target dev --platform linux/amd64 --build-arg DYNAMO_COMMIT_SHA=377e90d7619022927c63eaca68e3c225b5e3a34b --build-arg NIXL_REF=0.7.1 --build-arg BASE_IMAGE=nvcr.io/nvidia/cuda-dl-base --build-arg BASE_IMAGE_TAG=25.01-cuda12.8-devel-ubuntu24.04 --build-arg ENABLE_KVBM=true --build-arg NIXL_UCX_REF=v1.19.0 --build-arg DYNAMO_BASE_IMAGE=dynamo-base:v0.7.0 --tag dynamo:v0.7.0-vllm --tag dynamo:latest-vllm /root/dynamo
 #docker build --build-arg DEV_BASE=dynamo:v0.7.0-vllm --build-arg USER_UID=1000 --build-arg USER_GID=0 --build-arg ARCH=amd64 --file /root/dynamo/container/Dockerfile.local_dev --tag dynamo:v0.7.0-vllm-local-dev --tag dynamo:latest-vllm-local-dev /root/dynamo/container
 docker save dynamo-base:v0.7.0 -o 79fb418a2a55.tar
-ossutil cp 79fb418a2a55.tar oss://dynamo-images2/79fb418a2a55.tar
 docker save dynamo:v0.7.0-vllm -o ddd0509543e3.tar
+
+ossutil cp 79fb418a2a55.tar oss://dynamo-images2/79fb418a2a55.tar
 ossutil cp ddd0509543e3.tar oss://dynamo-images2/ddd0509543e3.tar
 
-
-
-
-
+#ossutil cp oss://dynamo-images2/79fb418a2a55.tar 79fb418a2a55.tar
+#ossutil cp oss://dynamo-images2/ddd0509543e3.tar ddd0509543e3.tar
 
 # dynamo: components/backends/vllm/src/dynamo/vllm/handlers.py: 184 行
 # prefill worker 返回给 decode worker 的 KV transfer 参数，告诉 decode 去哪里拉取已经计算好的 prefill 阶段的 KV cache，以便继续生成 decode 阶段的 token
